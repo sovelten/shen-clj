@@ -20,6 +20,10 @@
            ([_ _] :seq) 0
            :else (throw (Exception. "Clause must have only two forms")))))
 
+(defn function-symbol
+  [x]
+  (symbol (str "shen.functions/" x)))
+
 (defn kl->clj
   [locals expr]
   (cond
@@ -43,7 +47,10 @@
     ; _ [defun F Locals Code] -> (protect [DEFUN F Locals (kl-to-lisp Locals Code)])
     (match? expr (['defun _ _ _] :seq))
     (let [[_ name vars body] expr]
-      (list 'defn name (into [] vars) (kl->clj vars body)))
+      (list (function-symbol 'set*)
+            (list 'quote name)
+            (list 'fn (into [] vars) (kl->clj vars body))
+            (list 'quote 'shen.functions)))
 
     ; Locals [cond | Cond] -> (protect [COND | (MAPCAR (/. C (cond_code Locals C)) Cond)])
     (match? expr (['cond _] :seq))
@@ -57,8 +64,8 @@
     (list? expr)
     (let [[fst & rest] expr
           fname (if (list? fst)
-                  (kl->clj locals fst)
-                  (symbol (str "shen.functions/" fst)))]
+                  (kl->clj locals fst) ;TODO: if this evaluates to a symbol we need to add namespace
+                  (function-symbol fst))]
       (cons fname (for [arg rest]
                      (kl->clj locals arg))))
 

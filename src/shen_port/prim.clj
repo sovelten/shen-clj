@@ -109,8 +109,6 @@
              result#))))
   #_(list 'fn (eval x) (eval y)))
 
-(set* '+ #'c/+ 'shen.functions)
-
 (c/defmacro defun [name arglist body]
   (list 'set*
         (list 'quote name)

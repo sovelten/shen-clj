@@ -21,7 +21,9 @@
 (facts "self evaluate empty list"
        (fact (p/eval-kl '()) => ()))
 
-
 (facts "on lambda"
-       (fact (p/eval-kl '((lambda X (+ X X)) 2)) => 4)
-       #_(fact (prim/eval-kl '((lambda X (+ X X)) 2)) => 0))
+       (fact (p/eval-kl '((lambda X (+ X X)) 2)) => 4))
+
+(facts "on defun"
+       (fact (p/eval-kl '(defun func (x y) (+ x y))) => ifn?)
+       (fact (p/eval-kl '(func 3 4)) => 7))

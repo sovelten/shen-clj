@@ -6,15 +6,7 @@
 (create-ns 'shen.globals)
 (create-ns 'shen.functions)
 
-;;
-;; Symbols
-;;
-
 (def intern symbol)
-
-;;
-;; Assignments
-;;
 
 (defn set* [X Y ns]
   @(c/intern (the-ns ns)
@@ -33,15 +25,11 @@
 
 (defn value [X] (value* X 'shen.globals))
 
-;;
-;; LAMBDA
-;;
-
-
 ;;function declarations
 (set* 'set #'set 'shen.functions)
+(set* 'set* #'set* 'shen.functions) ;TODO: This is a bit weird
 (set* 'value #'value 'shen.functions)
-#_(set* '+ #'c/+ 'shen.functions)
+(set* '+ #'c/+ 'shen.functions)
 
 (defn eval-kl
   [X]
