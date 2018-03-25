@@ -50,14 +50,6 @@
     (let [[_ fst & clauses] expr]
       (list 'cond))
 
-    #_(match? expr (['set _ _] :seq))
-    #_(let [[_ name body] expr]
-      (list 'shen.functions/set (list 'quote name) (kl->clj locals body)))
-
-    #_(match? expr (['value _] :seq))
-    #_(let [[_ name] expr]
-      (list 'shen.functions/value (list 'quote name)))
-
     ; _ [] -> []
     (= '() expr)
     '()

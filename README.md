@@ -1,36 +1,13 @@
 # shen-port
 
-FIXME: description
+A Clojure port of the Shen Language
 
-## Installation
+# Status
 
-Download from http://example.com/FIXME.
+## Primitives
 
-## Usage
+- [X] set
+- [X] value
 
-FIXME: explanation
-
-    $ java -jar shen-port-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2017 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+- [X] lambda
+- [X] eval-kl
