@@ -24,6 +24,10 @@
   [x]
   (symbol (str "shen.functions/" x)))
 
+(defn internal-fn-symbol
+  [x]
+  (symbol (str "shen.primitives/" x)))
+
 (defn kl->clj
   [locals expr]
   (cond
@@ -47,9 +51,9 @@
     ; _ [defun F Locals Code] -> (protect [DEFUN F Locals (kl-to-lisp Locals Code)])
     (match? expr (['defun _ _ _] :seq))
     (let [[_ name vars body] expr]
-      (list (function-symbol 'set*)
+      (list (symbol (str "shen.primitives/" 'set*))
             (list 'quote name)
-            (list 'fn (into [] vars) (kl->clj vars body))
+            (list (internal-fn-symbol 'curried-fn) (list 'quote (list (into [] vars) (kl->clj vars body))))
             (list 'quote 'shen.functions)))
 
     ; Locals [cond | Cond] -> (protect [COND | (MAPCAR (/. C (cond_code Locals C)) Cond)])

@@ -26,4 +26,7 @@
 
 (facts "on defun"
        (fact (p/eval-kl '(defun func (x y) (+ x y))) => ifn?)
-       (fact (p/eval-kl '(func 3 4)) => 7))
+       (fact (p/eval-kl '(func 3 4)) => 7)
+       (fact (p/eval-kl '(func 3)) => ifn?)
+       (fact "currying"
+             (p/eval-kl '((func 3) 4)) => 7))
