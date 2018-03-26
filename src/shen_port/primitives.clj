@@ -35,13 +35,9 @@
   [params]
   (eval (do-curried 'fn curry params)))
 
-
-(c/defmacro fn-curried
-  "Builds a multiple arity function similar that returns closures
-          for the missing parameters, similar to ML's behaviour."
+(defmacro defn-curried
   [& params]
-  (println params)
-  (do-curried 'fn curry params))
+  (do-curried 'defn curry params))
 
 (def intern symbol)
 
@@ -62,12 +58,30 @@
 
 (defn value [X] (value* X 'shen.globals))
 
-;;function declarations
+;;
+;; Arithmetic
+;;
+
+(defn-curried + [x y] (c/+ x y))
+(defn-curried - [x y] (c/- x y))
+(defn-curried * [x y] (c/* x y))
+(defn-curried / [x y] (c// x y))
+
+;;
+;; Function Declarations
+;;
+
+;; Not part of the language, but used internally
+(set* 'set* #'set* 'shen.primitives) 
+(set* 'curried-fn #'curried-fn 'shen.primitives)
+
+;; KL Functions
 (set* 'set #'set 'shen.functions)
-(set* 'set* #'set* 'shen.primitives) ;to avoid possible naming conflicts
-(set* 'curried-fn #'curried-fn 'shen.primitives) ;to avoid possible naming conflicts
 (set* 'value #'value 'shen.functions)
-(set* '+ #'c/+ 'shen.functions)
+(set* '+ #'+ 'shen.functions)
+(set* '- #'- 'shen.functions)
+(set* '* #'* 'shen.functions)
+(set* '/ #'/ 'shen.functions)
 
 (defn eval-kl
   [X]

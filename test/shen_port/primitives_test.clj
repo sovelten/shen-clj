@@ -30,3 +30,9 @@
        (fact (p/eval-kl '(func 3)) => ifn?)
        (fact "currying"
              (p/eval-kl '((func 3) 4)) => 7))
+
+(facts "arithmetic"
+       (fact "+" (p/eval-kl '(+ 2 4)) => 6)
+       (fact "+-curried" (p/eval-kl '((+ 1) 4)) => 5)
+       (fact "-" (p/eval-kl '(- 10 5)) => 5)
+       (fact "/" (p/eval-kl '(/ 10 5)) => 2))
