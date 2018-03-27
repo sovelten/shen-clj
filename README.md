@@ -6,7 +6,7 @@ A Clojure port of the Shen Language
 
 ## Primitives
 
-Progress: 9/57
+Progress: 15/57
 
 - [X] set
 - [X] value
@@ -17,3 +17,9 @@ Progress: 9/57
 - [X] -
 - [X] /
 - [X] *
+- [X] freeze
+- [X] and
+- [X] or
+- [X] let
+- [X] if
+- [X] cond

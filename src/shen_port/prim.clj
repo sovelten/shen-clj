@@ -78,37 +78,6 @@
 ;; Functions
 ;;
 
-(c/defmacro lambda
-  [x y]
-  (list 'fn [x] y))
-
-(c/defmacro agoravai
-  [x y] `(list 'fn [~x] ~y))
-
-(c/defmacro agoravai2
-  [args & body]
-  `(fn [~args] ~@body))
-
-(c/defmacro lambda3 [X Y]
-  `(fn [~X & XS#]
-     (c/let [result# ~Y]
-       (if XS# (apply result# XS#)
-           result#))))
-
-(c/defmacro lambda4 [X Y]
-  `(lambda3 ~X ~Y))
-
-(c/defmacro lambda2
-  [x y]
-  `(do
-     (println ~x)
-     (println ~y)
-     (fn [~x & XS#]
-       (c/let [result# ~y]
-         (if XS# (apply result# XS#)
-             result#))))
-  #_(list 'fn (eval x) (eval y)))
-
 (c/defmacro defun [name arglist body]
   (list 'set*
         (list 'quote name)

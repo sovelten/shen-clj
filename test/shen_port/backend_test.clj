@@ -13,7 +13,9 @@
        (fact (backend/kl->clj [] '(let x 5 z)) => '(let [x 5] (quote z))))
 
 (facts "(defun name vars body)"
-       (fact (backend/kl->clj [] '(defun func (x) x)) => '(shen.functions/set* (quote func) (fn [x] x) (quote shen.functions))))
+       (fact (backend/kl->clj [] '(defun func (x) x)) => '(shen.primitives/set* (quote func)
+                                                                                (shen.primitives/curried-fn (quote ([x] x)))
+                                                                                (quote shen.functions))))
 
 (facts "empty list"
        (fact (backend/kl->clj [] '()) => '()))

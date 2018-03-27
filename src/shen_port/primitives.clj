@@ -68,12 +68,35 @@
 (defn-curried / [x y] (c// x y))
 
 ;;
+;; Conditionals
+;;
+
+(defn andp [x]
+  (fn [y]
+    (c/and x y)))
+
+(defn orp [x]
+  (fn [y]
+    (c/or x y)))
+
+(defn ifp
+  ([test]
+   (fn [p1 p2]
+     (if test p1 p2)))
+  ([test p1]
+   (fn [p2]
+     (if test p1 p2))))
+
+;;
 ;; Function Declarations
 ;;
 
 ;; Not part of the language, but used internally
-(set* 'set* #'set* 'shen.primitives) 
+(set* 'set* #'set* 'shen.primitives)
 (set* 'curried-fn #'curried-fn 'shen.primitives)
+(set* 'andp #'andp 'shen.primitives)
+(set* 'orp #'orp 'shen.primitives)
+(set* 'ifp #'ifp 'shen.primitives)
 
 ;; KL Functions
 (set* 'set #'set 'shen.functions)
