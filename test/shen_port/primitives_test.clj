@@ -94,3 +94,13 @@
        (fact (p/eval-kl '(string->n "b")) => 98)
        (fact (p/eval-kl '(string->n "bx")) => 98)
        (fact (p/eval-kl '(n->string 90)) => "Z"))
+
+(facts "Vectors"
+       (fact "create vector vec"
+             (p/eval-kl '(absvector? (set vec (absvector 4)))) => true)
+       (fact "assign a value to pos 0"
+             (p/eval-kl '(address-> (value vec) 0 15)) => anything)
+       (fact "get value back"
+             (p/eval-kl '(<-address (value vec) 0)) => 15)
+       (fact "vec is a vector"
+             (p/eval-kl '(absvector? (value vec))) => true))

@@ -1,6 +1,7 @@
 (ns shen-port.primitives
   (:require [clojure.core :as c]
             [shen-port.backend :as backend])
+  (:import [java.util Arrays])
   (:refer-clojure :exclude [set intern]))
 
 (create-ns 'shen.globals)
@@ -133,6 +134,51 @@
   (c/str (char N)))
 
 ;;
+;; Vectors
+;;
+
+(def ^:private array-class (Class/forName "[Ljava.lang.Object;"))
+
+(defn absvector [N]
+  (doto (object-array (int N)) (Arrays/fill 'fail!)))
+
+(defn absvector? [X]
+  (identical? array-class (c/class X)))
+
+(defn <-address [#^"[Ljava.lang.Object;" Vector N]
+  (aget Vector (int N)))
+
+(defn address-> [#^"[Ljava.lang.Object;" Vector N Value]
+  (aset Vector (int N) Value)
+  Vector)
+
+;;
+;; Conses
+;;
+
+(defn ^:private pair [X Y] [X Y])
+
+(defn ^:private pair? [X]
+  (c/and (vector? X) (= 2 (count X))))
+
+(defn cons?
+  [X]
+  (c/and (coll? X) (not (.isEmpty ^java.util.Collection X))))
+
+(defn cons [X Y]
+  (if (c/and (coll? Y)
+             (not (pair? Y)))
+    (c/cons X Y)
+    (pair X Y)))
+
+(defn hd [X] (first X))
+
+(defn tl [X]
+  (if (pair? X)
+    (second X)
+    (rest X)))
+
+;;
 ;; Function Declarations
 ;;
 
@@ -166,6 +212,10 @@
 (set* 'str #'str 'shen.functions)
 (set* 'string->n #'string->n 'shen.functions)
 (set* 'n->string #'n->string 'shen.functions)
+(set* 'absvector #'absvector 'shen.functions)
+(set* 'absvector? #'absvector? 'shen.functions)
+(set* 'address-> #'address-> 'shen.functions)
+(set* '<-address #'<-address 'shen.functions)
 
 (defn eval-kl
   [X]
