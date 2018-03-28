@@ -84,3 +84,13 @@
        (fact (p/eval-kl '(>= 5 5)) => true)
        (fact (p/eval-kl '(< 5 5)) => false)
        (fact (p/eval-kl '(<= 5 5)) => true))
+
+(facts "Strings"
+       (fact (p/eval-kl '(string? "asdf")) => true)
+       (fact (p/eval-kl '(cn "ba" "nana")) => "banana")
+       (fact (p/eval-kl '(pos "abcd" 3)) => "d")
+       (fact (p/eval-kl '(tlstr "abc")) => "bc")
+       (fact (p/eval-kl '(str 256)) => "256")
+       (fact (p/eval-kl '(string->n "b")) => 98)
+       (fact (p/eval-kl '(string->n "bx")) => 98)
+       (fact (p/eval-kl '(n->string 90)) => "Z"))

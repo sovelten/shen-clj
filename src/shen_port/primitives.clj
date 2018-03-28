@@ -109,10 +109,28 @@
       @v)))
 
 ;;
-;; Numerics
+;; Strings
 ;;
 
+(defn-curried pos
+  [X N]
+  (c/str (get X N)))
 
+(defn tlstr
+  [X]
+  (subs X 1))
+
+(defn-curried cn
+  [Str1 Str2]
+  (str Str1 Str2))
+
+(defn string->n
+  [S]
+  (c/int (first S)))
+
+(defn n->string
+  [N]
+  (c/str (char N)))
 
 ;;
 ;; Function Declarations
@@ -141,6 +159,13 @@
 (set* '>= #'c/>= 'shen.functions)
 (set* '< #'c/< 'shen.functions)
 (set* '<= #'c/<= 'shen.functions)
+(set* 'string? #'c/string? 'shen.functions)
+(set* 'pos #'pos 'shen.functions)
+(set* 'tlstr #'tlstr 'shen.functions)
+(set* 'cn #'cn 'shen.functions)
+(set* 'str #'str 'shen.functions)
+(set* 'string->n #'string->n 'shen.functions)
+(set* 'n->string #'n->string 'shen.functions)
 
 (defn eval-kl
   [X]
