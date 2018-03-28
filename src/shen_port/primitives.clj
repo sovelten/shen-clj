@@ -39,23 +39,6 @@
   [& params]
   (do-curried 'defn curry params))
 
-(def intern symbol)
-
-(defn set* [X Y ns]
-  @(c/intern (the-ns ns)
-             (with-meta X {:dynamic true :declared true})
-             Y))
-
-(defn set
-  ([X] (partial set X))
-  ([X Y] (set* X Y 'shen.globals)))
-
-(defn ^:private value* [X ns]
-  (c/let [v (c/and (symbol? X) (ns-resolve ns X))]
-    (if (nil? v)
-      (throw (IllegalArgumentException. (c/str "variable " X " has no value")))
-      @v)))
-
 (defn value [X] (value* X 'shen.globals))
 
 ;;
@@ -87,6 +70,50 @@
    (fn [p2]
      (if test p1 p2))))
 
+;;;
+;;; Error Handling
+;;;
+
+(defn simple-error
+  [message]
+  (throw (Exception. message)))
+
+(defn error-to-string
+  [exception]
+  (.getMessage exception))
+
+;;
+;; Symbols
+;;
+
+(defn intern
+  [str]
+  (case str
+    "true" true
+    "false" false
+    (symbol str)))
+
+(defn set* [X Y ns]
+  @(c/intern (the-ns ns)
+             (with-meta X {:dynamic true :declared true})
+             Y))
+
+(defn set
+  ([X] (partial set X))
+  ([X Y] (set* X Y 'shen.globals)))
+
+(defn ^:private value* [X ns]
+  (c/let [v (c/and (symbol? X) (ns-resolve ns X))]
+    (if (nil? v)
+      (throw (IllegalArgumentException. (c/str "variable " X " has no value")))
+      @v)))
+
+;;
+;; Numerics
+;;
+
+
+
 ;;
 ;; Function Declarations
 ;;
@@ -105,6 +132,15 @@
 (set* '- #'- 'shen.functions)
 (set* '* #'* 'shen.functions)
 (set* '/ #'/ 'shen.functions)
+(set* 'simple-error #'simple-error 'shen.functions)
+(set* 'error-to-string #'error-to-string 'shen.functions)
+(set* 'intern #'intern 'shen.functions)
+(set* 'symbol? #'c/symbol? 'shen.functions)
+(set* 'number? #'c/number? 'shen.functions)
+(set* '> #'c/> 'shen.functions)
+(set* '>= #'c/>= 'shen.functions)
+(set* '< #'c/< 'shen.functions)
+(set* '<= #'c/<= 'shen.functions)
 
 (defn eval-kl
   [X]

@@ -65,3 +65,22 @@
                                (true 5))) => 5)
        (fact (p/eval-kl '(cond (false 4)
                                (false 5))) => "TODO"))
+
+(facts "Error Handling"
+       (fact (p/eval-kl '(simple-error "My error")) => (throws "My error"))
+       (fact (p/eval-kl '(trap-error (+ 2 3) (lambda E E))) => 5)
+       (fact (p/eval-kl '(trap-error (simple-error "My error") (lambda E (error-to-string E)))) => "My error"))
+
+(facts "Symbols"
+       (fact (p/eval-kl '(intern "true")) => true)
+       (fact (p/eval-kl '(intern "false")) => false)
+       (fact (p/eval-kl '(symbol? (intern "true"))) => false))
+
+(facts "Number Comparison"
+       (fact (p/eval-kl '(number? 10)) => true)
+       (fact (p/eval-kl '(number? banana)) => false)
+       (fact (p/eval-kl '(> 6 5)) => true)
+       (fact (p/eval-kl '(> 5 6)) => false)
+       (fact (p/eval-kl '(>= 5 5)) => true)
+       (fact (p/eval-kl '(< 5 5)) => false)
+       (fact (p/eval-kl '(<= 5 5)) => true))

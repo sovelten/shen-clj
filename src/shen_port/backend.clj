@@ -94,6 +94,11 @@
     (let [[_ x y] expr]
       (list (internal-fn-symbol 'ifp) (kl->clj locals x) (kl->clj locals y)))
 
+    (match? expr (['trap-error _ _] :seq))
+    (let [[_ body handler] expr
+          e (gensym "e")]
+      (list 'try (kl->clj locals body) (list 'catch 'Exception e (list (kl->clj locals handler) e))))
+
     ; _ [] -> []
     (= '() expr)
     '()

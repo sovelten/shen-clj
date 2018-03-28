@@ -6,7 +6,7 @@ A Clojure port of the Shen Language
 
 ## Primitives
 
-Progress: 15/57
+Progress: 25/57
 
 - [X] set
 - [X] value
@@ -23,3 +23,13 @@ Progress: 15/57
 - [X] let
 - [X] if
 - [X] cond
+- [X] trap-error
+- [X] simple-error
+- [X] error-to-string
+- [X] intern
+- [X] symbol?
+- [X] number?
+- [X] >
+- [X] <
+- [X] >=
+- [X] <=
