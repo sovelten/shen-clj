@@ -40,7 +40,6 @@
   [& params]
   (do-curried 'defn curry params))
 
-(defn value [X] (value* X 'shen.globals))
 
 ;;
 ;; Arithmetic
@@ -109,6 +108,8 @@
       (throw (IllegalArgumentException. (c/str "variable " X " has no value")))
       @v)))
 
+(defn value [X] (value* X 'shen.globals))
+
 ;;
 ;; Strings
 ;;
@@ -156,27 +157,30 @@
 ;; Conses
 ;;
 
-(defn ^:private pair [X Y] [X Y])
-
-(defn ^:private pair? [X]
-  (c/and (vector? X) (= 2 (count X))))
-
 (defn cons?
   [X]
-  (c/and (coll? X) (not (.isEmpty ^java.util.Collection X))))
+  (c/and (list? X) (= 2 (count X))))
 
-(defn cons [X Y]
-  (if (c/and (coll? Y)
-             (not (pair? Y)))
-    (c/cons X Y)
-    (pair X Y)))
+(defn-curried cons
+  [X Y]
+  (if (cons? Y)
+    (list X Y)
+    (list X Y)))
 
-(defn hd [X] (first X))
+(defn hd
+  [X]
+  (if (cons? X)
+    (first X)
+    (simple-error "Not a cons")))
 
-(defn tl [X]
-  (if (pair? X)
-    (second X)
-    (rest X)))
+(defn tl
+  [X]
+  (if (cons? X)
+      (let [tail (rest X)]
+        (if (cons? rem)
+          tail
+          (first tail)))
+      (simple-error "Not a cons")))
 
 ;;
 ;; Function Declarations
@@ -216,6 +220,10 @@
 (set* 'absvector? #'absvector? 'shen.functions)
 (set* 'address-> #'address-> 'shen.functions)
 (set* '<-address #'<-address 'shen.functions)
+(set* 'cons? #'cons? 'shen.functions)
+(set* 'cons #'cons 'shen.functions)
+(set* 'hd #'hd 'shen.functions)
+(set* 'tl #'tl 'shen.functions)
 
 (defn eval-kl
   [X]

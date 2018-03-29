@@ -6,7 +6,7 @@ A Clojure port of the Shen Language
 
 ## Primitives
 
-Progress: 36/57
+Progress: 40/46
 
 - [X] set
 - [X] value
@@ -44,3 +44,7 @@ Progress: 36/57
 - [X] absvector?
 - [X] address->
 - [X] <-address
+- [X] cons?
+- [X] cons
+- [X] hd
+- [X] tl

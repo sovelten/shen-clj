@@ -104,3 +104,17 @@
              (p/eval-kl '(<-address (value vec) 0)) => 15)
        (fact "vec is a vector"
              (p/eval-kl '(absvector? (value vec))) => true))
+
+(facts "Conses"
+       (fact (p/eval-kl '(cons? ())) => false)
+       (fact (p/eval-kl '(cons? (cons 1))) => false)
+       (fact (p/eval-kl '(cons? (cons 1 2))) => true)
+       (fact (p/eval-kl '(cons 1 2)) => '(1 2))
+       (fact (p/eval-kl '(cons 1 ())) => '(1 ()))
+       (fact (p/eval-kl '(cons 1 (cons 2 ()))) => '(1 (2 ())))
+       (fact (p/eval-kl '(cons 1 (cons 2 (cons 3 ())))) => '(1 (2 (3 ()))))
+       (fact (p/eval-kl '(cons 1 (cons 2 (cons 3 ())))) => '(1 (2 (3 ()))))
+       (fact (p/eval-kl '(hd 1)) => (throws "Not a cons"))
+       (fact (p/eval-kl '(hd (cons 1 ()))) => 1)
+       (fact (p/eval-kl '(tl (cons 1 ()))) => '())
+       (fact (p/eval-kl '(tl (cons 1 (cons 2 ())))) => '(2 ())))
