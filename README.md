@@ -6,7 +6,7 @@ A Clojure port of the Shen Language
 
 ## Primitives
 
-Progress: 40/46
+Progress: 47/47
 
 - [X] set
 - [X] value
@@ -48,3 +48,10 @@ Progress: 40/46
 - [X] cons
 - [X] hd
 - [X] tl
+- [X] read-byte
+- [X] write-byte
+- [X] open
+- [X] close
+- [X] boolean?
+- [X] get-time
+- [X] type

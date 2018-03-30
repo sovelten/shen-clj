@@ -1,8 +1,9 @@
 (ns shen-port.primitives
   (:require [clojure.core :as c]
+            [clojure.java.io :as io]
             [shen-port.backend :as backend])
   (:import [java.util Arrays])
-  (:refer-clojure :exclude [set intern]))
+  (:refer-clojure :exclude [set intern cons + - / *]))
 
 (create-ns 'shen.globals)
 (create-ns 'shen.functions)
@@ -157,15 +158,23 @@
 ;; Conses
 ;;
 
+(defn pair?
+  [X]
+  (c/and (vector? X) (= 2 (count X))))
+
 (defn cons?
   [X]
-  (c/and (list? X) (= 2 (count X))))
+  (boolean (c/or (c/and (seq? X) (not-empty X))
+                 (c/and (vector? X) (= 2 (count X))))))
 
 (defn-curried cons
   [X Y]
-  (if (cons? Y)
-    (list X Y)
-    (list X Y)))
+  (cond
+    (cons? Y) (if (pair? Y)
+                (list X Y)
+                (c/cons X Y))
+    (= () Y)  (c/cons X Y)
+    :else     (vector X Y)))
 
 (defn hd
   [X]
@@ -176,11 +185,58 @@
 (defn tl
   [X]
   (if (cons? X)
-      (let [tail (rest X)]
-        (if (cons? rem)
-          tail
-          (first tail)))
-      (simple-error "Not a cons")))
+    (if (pair? X)
+      (second X)
+      (rest X))
+    (simple-error "Not a cons")))
+
+;;
+;; Streams
+;;
+
+(set '*stinput* *in*)
+(set '*stoutput* *out*)
+
+(defn-curried write-byte
+  [N stream]
+  (.write stream 65))
+
+(defn read-byte
+  [stream]
+  (.read stream))
+
+(defn-curried open
+  [file mode]
+  (cond
+    (= 'out mode) (io/writer file)
+    (= 'in mode)  (io/input-stream file)
+    :else         (simple-error "Wrong opening mode")))
+
+(defn close
+  [stream]
+  (.close stream))
+
+;;
+;; General
+;;
+
+(defn eval-kl
+  [X]
+  (eval (backend/kl->clj [] X)))
+
+;;
+;; Informational
+;;
+
+(def ^:private internal-start-time (System/currentTimeMillis))
+
+(defn get-time
+  [time]
+  (cond
+    (= time 'run)  (/ (- (System/currentTimeMillis) internal-start-time) 1000)
+    (= time 'unix) (long (/ (System/currentTimeMillis) 1000))
+    :else          (throw (IllegalArgumentException.
+                           (c/str "get-time does not understand the parameter " time)))))
 
 ;;
 ;; Function Declarations
@@ -224,8 +280,11 @@
 (set* 'cons #'cons 'shen.functions)
 (set* 'hd #'hd 'shen.functions)
 (set* 'tl #'tl 'shen.functions)
-
-(defn eval-kl
-  [X]
-  (eval (doto (backend/kl->clj [] X) println)))
-
+(set* '= #'= 'shen.functions)
+(set* 'eval-kl #'eval-kl 'shen.functions)
+(set* 'boolean? #'boolean? 'shen.functions)
+(set* 'read-byte #'read-byte 'shen.functions)
+(set* 'write-byte #'write-byte 'shen.functions)
+(set* 'open #'open 'shen.functions)
+(set* 'close #'close 'shen.functions)
+(set* 'get-time #'get-time 'shen.functions)
