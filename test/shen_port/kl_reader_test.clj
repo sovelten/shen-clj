@@ -34,3 +34,24 @@
        (fact (kl-reader/read "(+ 1 2)") => '(+ 1 2))
        (fact (kl-reader/read "(+ 1 2 \"bla\" (s a b c))")
              => '(+ 1 2 "bla" (s a b c))))
+
+(facts "ignore new lines"
+       (fact (kl-reader/read "25") => 25)
+       (fact (kl-reader/read "bla") => 'bla)
+       (fact (kl-reader/read "\"bla\"") => "bla")
+       (fact (kl-reader/read "(\n+ 1\n 2\n)") => '(+ 1 2))
+       (fact (kl-reader/read "\n(+ 1 2 \"bla\" \n(s a b c))")
+             => '(+ 1 2 "bla" (s a b c))))
+
+(facts "file parser"
+       (fact (kl-reader/file-parser "\n\n(+ 1 2)\n\n (+ 4 5)\n")
+             => [:file
+                 [:klexpr [:list [:symbol "+"][:number "1"] [:number "2"]]]
+                 [:klexpr [:list [:symbol "+"][:number "4"] [:number "5"]]]]))
+
+(facts "read-file"
+       (fact (kl-reader/read-file "\n\n(+ 1 2)\n\n (+ 4 5)\n")
+             => [:file
+                 [:klexpr [:list [:symbol "+"][:number "1"] [:number "2"]]]
+                 [:klexpr [:list [:symbol "+"][:number "4"] [:number "5"]]]]))
+
