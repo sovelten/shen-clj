@@ -36,9 +36,13 @@
     (catch Exception e
       (println file e))))
 
+(defn my-read
+  [file]
+  (slurp file))
+
 (defn -main
   "I don't do a whole lot ... yet."
   [file & args]
-  (let [forms (rest (rest (read-kl-file file)))]
-    (println (first forms))
-    (println (backend/kl->clj [] (first forms)))))
+  (let [forms (read-string (my-read file))]
+    (println forms)
+    #_(println (backend/kl->clj [] (first forms)))))
