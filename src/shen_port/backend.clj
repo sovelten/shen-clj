@@ -7,19 +7,6 @@
           ~clause true
           :else false))
 
-(defn subst
-  [x y expr]
-  (if (= expr x)
-    y
-    (replace {x y} expr)))
-
-(defn cond-clause
-  [locals clause]
-  (let [[test body] clause]
-    (match clause
-           ([_ _] :seq) 0
-           :else (throw (Exception. "Clause must have only two forms")))))
-
 (defn function-symbol
   [x]
   (symbol (str "shen.functions/" x)))
@@ -116,37 +103,3 @@
     (list 'quote expr)
 
     :else expr))
-
-(defn shen-boolean
-  [x]
-  (cond
-    (= x 'true)  'true
-    (= x 'false) 'false
-    :else (throw (Exception. "Boolean expected"))))
-
-(defn wrap
-  [expr]
-  (cond
-    (match? expr (['cons? _] :seq)) (let [x (second expr)]
-                                      (list 'boolean (list 'not-empty x)))
-
-    (match? expr (['string? _] :seq)) expr
-    (match? expr (['number? _] :seq)) expr
-    (match? expr (['empty? _] :seq))  expr
-
-    (match? expr (['and _ _] :seq)) (let [[_ x y] expr]
-                                      (list 'and (wrap x) (wrap y)))
-
-    (match? expr (['or _ _] :seq)) (let [[_ x y] expr]
-                                     (list 'or (wrap x) (wrap y)))
-
-    (match? expr (['not _] :seq)) (let [[_ x] expr]
-                                    (list 'not (wrap x)))
-
-    (match? expr (['= _ ([] :seq)] :seq)) (let [[_ x _] expr]
-                                    (list 'empty? x))
-
-    (match? expr (['= ([] :seq) _] :seq)) (let [[_ _ y] expr]
-                                    (list 'empty? y))
-
-    :else (list 'shen-boolean expr)))

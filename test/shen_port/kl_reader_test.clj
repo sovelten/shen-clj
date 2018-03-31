@@ -18,6 +18,7 @@
        (fact (kl-reader/parser "bla") => [:klexpr [:symbol "bla"]])
        (fact (kl-reader/parser "V12345") => [:klexpr [:symbol "V12345"]])
        (fact (kl-reader/parser "-") => [:klexpr [:symbol "-"]])
+       (fact (kl-reader/parser "-->") => [:klexpr [:symbol "-->"]])
        (fact (kl-reader/parser "*") => [:klexpr [:symbol "*"]])
 
        (fact (kl-reader/parser "()") => [:klexpr [:list]])
@@ -51,7 +52,10 @@
 
 (facts "read-file"
        (fact (kl-reader/read-file "\n\n(+ 1 2)\n\n (+ 4 5)\n")
-             => [:file
-                 [:klexpr [:list [:symbol "+"][:number "1"] [:number "2"]]]
-                 [:klexpr [:list [:symbol "+"][:number "4"] [:number "5"]]]]))
+             => '((+ 1 2) (+ 4 5))))
+
+(def sample "(defun shen.curry-type (V1397) (cond ((and (cons? V1397) (and (cons? (tl V1397)) (and (= --> (hd (tl V1397))) (and (cons? (tl (tl V1397))) (and (cons? (tl (tl (tl V1397)))) (= --> (hd (tl (tl (tl V1397)))))))))) (shen.curry-type (cons (hd V1397) (cons --> (cons (tl (tl V1397)) ()))))) ((and (cons? V1397) (and (cons? (tl V1397)) (and (= * (hd (tl V1397))) (and (cons? (tl (tl V1397))) (and (cons? (tl (tl (tl V1397)))) (= * (hd (tl (tl (tl V1397)))))))))) (shen.curry-type (cons (hd V1397) (cons * (cons (tl (tl V1397)) ()))))) ((cons? V1397) (map (lambda Z (shen.curry-type Z)) V1397)) (true V1397)))")
+
+(facts "sample"
+       (fact (kl-reader/parser sample) => anything))
 
