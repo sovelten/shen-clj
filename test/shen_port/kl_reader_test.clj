@@ -31,6 +31,9 @@
 (facts "read"
        (fact (kl-reader/read "25") => 25)
        (fact (kl-reader/read "bla") => 'bla)
+       (fact (kl-reader/read "@") => '-at-)
+       (fact (kl-reader/read "/") => '/)
+       (fact (kl-reader/read "/bla") => '-slash-bla)
        (fact (kl-reader/read "\"bla\"") => "bla")
        (fact (kl-reader/read "(+ 1 2)") => '(+ 1 2))
        (fact (kl-reader/read "(+ 1 2 \"bla\" (s a b c))")
@@ -53,9 +56,3 @@
 (facts "read-file"
        (fact (kl-reader/read-file "\n\n(+ 1 2)\n\n (+ 4 5)\n")
              => '((+ 1 2) (+ 4 5))))
-
-(def sample "(defun shen.curry-type (V1397) (cond ((and (cons? V1397) (and (cons? (tl V1397)) (and (= --> (hd (tl V1397))) (and (cons? (tl (tl V1397))) (and (cons? (tl (tl (tl V1397)))) (= --> (hd (tl (tl (tl V1397)))))))))) (shen.curry-type (cons (hd V1397) (cons --> (cons (tl (tl V1397)) ()))))) ((and (cons? V1397) (and (cons? (tl V1397)) (and (= * (hd (tl V1397))) (and (cons? (tl (tl V1397))) (and (cons? (tl (tl (tl V1397)))) (= * (hd (tl (tl (tl V1397)))))))))) (shen.curry-type (cons (hd V1397) (cons * (cons (tl (tl V1397)) ()))))) ((cons? V1397) (map (lambda Z (shen.curry-type Z)) V1397)) (true V1397)))")
-
-(facts "sample"
-       (fact (kl-reader/parser sample) => anything))
-

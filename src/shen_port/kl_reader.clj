@@ -1,5 +1,6 @@
 (ns shen-port.kl-reader
   (:require [instaparse.core :as insta]
+            [clojure.string :as s]
             [clojure.java.io :as io])
   (:refer-clojure :exclude [read]))
 
@@ -12,9 +13,28 @@
   (insta/parser (str "file = klexpr+ <whitespace>*"
                      parser-grammar)))
 
+(def replacements
+  [[#"@" "-at-"]
+   [#"\." "-dot-"]])
+
+(defn replace-all
+  [x replacements]
+  (if (empty? replacements)
+    x
+    (let [[match replacement] (first replacements)]
+      (recur (s/replace x match replacement) (rest replacements)))))
+
+(defn replace-slash
+  [x]
+  (if (= x "/") x (s/replace x #"/" "-slash-")))
+
+(defn kl-symbol
+  [x]
+  (symbol (replace-all (replace-slash x) replacements)))
+
 (def transform-options
   {:number read-string
-   :symbol symbol
+   :symbol kl-symbol
    :string identity
    :list   list})
 

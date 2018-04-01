@@ -222,7 +222,23 @@
 
 (defn eval-kl
   [X]
-  (eval (backend/kl->clj [] X)))
+  (eval (doto (backend/kl->clj [] X) println)))
+
+(defmacro with-ns
+  "Evaluates body in another namespace.  ns is either a namespace
+  object or a symbol.  This makes it possible to define functions in
+  namespaces other than the current one."
+  [ns & body]
+  `(binding [*ns* (the-ns ~ns)]
+     ~@(map (fn [form] `(eval '~form)) body)))
+
+(defmacro with-ns-2
+  "Evaluates body in another namespace.  ns is either a namespace
+  object or a symbol.  This makes it possible to define functions in
+  namespaces other than the current one."
+  [ns body]
+  `(binding [*ns* (the-ns ~ns)]
+     (eval '~body)))
 
 ;;
 ;; Informational

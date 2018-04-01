@@ -25,11 +25,11 @@
        (fact (p/eval-kl '((lambda X (+ X X)) 2)) => 4))
 
 (facts "on defun"
+       (fact (p/eval-kl '(do (defun func (x) (+ x 2)) (func 5))) => 7)
        (fact (p/eval-kl '(defun func (x y) (+ x y))) => ifn?)
        (fact (p/eval-kl '(func 3 4)) => 7)
        (fact (p/eval-kl '(func 3)) => ifn?)
-       (fact "currying"
-             (p/eval-kl '((func 3) 4)) => 7))
+       (fact "currying" (p/eval-kl '((func 3) 4)) => 7))
 
 (facts "on let"
        (fact (p/eval-kl '(let X 4 (+ X 2))) => 6))
@@ -123,9 +123,10 @@
 
 (facts "Streams"
        (fact (p/eval-kl '(value *stinput*)) => *in*)
-       (fact (p/eval-kl '(value *stoutput*)) => *out*)
+       (fact (p/eval-kl '(value *stoutput*)) => *out*))
 
-       )
+(facts "do"
+       (fact (p/eval-kl '(do (set myval 13) (value myval))) => 13))
 
 (facts "Expected properties"
        (fact (p/eval-kl '(= "str" (cn "str" ""))) => true)
@@ -133,8 +134,7 @@
        (fact (p/eval-kl '(= "str" (cn (pos "str" 0) (tlstr "str")))) => true)
        (fact (p/eval-kl '(= (pos "str" 0) (n->string (string->n "str")))) => true)
        (fact (p/eval-kl '(= (intern "str") (intern "str"))) => true)
-       (fact (p/eval-kl '(set x y))
-             (p/eval-kl '(= (value x) y)) => true)
+       (fact (p/eval-kl '(do (set x y) (= (value x) y))) => true)
        (fact (p/eval-kl '(= (intern "str") (intern "str"))) => true)
        (fact (p/eval-kl '(= "error" (trap-error (simple-error "error") (lambda E (error-to-string E))))) => true)
        (fact (p/eval-kl '(= "foo" (hd (cons "foo" "bar")))) => true)
@@ -158,3 +158,9 @@
 (facts "time"
        (fact (p/eval-kl '(get-time run)) => number?)
        (fact (p/eval-kl '(get-time unix)) => number?))
+
+(def code-sample '(defun shen.find (V3990 V3991) (cond ((= () V3991) ()) ((and (cons? V3991) (V3990 (hd V3991))) (cons (hd V3991) (shen.find V3990 (tl V3991)))) ((cons? V3991) (shen.find V3990 (tl V3991))) (true (shen.f_error shen.find)))))
+
+
+#_(facts ""
+       (fact (p/eval-kl code-sample) => nil))

@@ -52,30 +52,38 @@
 
 (defn symbol->declare-str
   [s]
-  (str "(declare " s ")"))
+  (str "(clojure.core/declare " s ")"))
 
 (defn to-str
-  [declarations clj-exprs]
+  [clj-exprs]
   (let [header-str   (pr-str (header 'shen))
-        declare-strs (map symbol->declare-str declarations)
         forms-strs   (for [expr clj-exprs]
                        (if (string? expr)
                          (str "(comment \"" expr "\")")
                          (pr-str expr)))]
-    (s/join "\n" (cons header-str (concat declare-strs forms-strs)))))
+    (s/join "\n" forms-strs)))
 
 (defn process-file
-  [file]
-  (let [kl-forms     (kl-reader/read-file (slurp (str kl-path file)))
-        declarations (declarations kl-forms)]
-    (spit (str clj-path (clj-filename file))
-          (to-str declarations (map #(backend/kl->clj [] %) kl-forms)))))
+  [content filename]
+  (println "Reading" filename)
+  (let [kl-forms     (kl-reader/read-file content)
+        declarations (declarations kl-forms)
+        output-str   (to-str (map #(backend/kl->clj [] %) kl-forms))]
+    #_(spit (str clj-path (clj-filename file)) output-str)
+    #_(spit (str clj-path "clj-declarations.clj") output-str)
+    [declarations output-str]))
+
+(defn write-declarations
+  [declarations]
+  (spit (str clj-path "clj-declarations.clj")
+        (str "(ns shen.functions)\n" (s/join "\n" (map symbol->declare-str declarations)))))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (if (first args)
-    (println (kl-reader/read-file (slurp (str kl-path (first args)))))
-    (doseq [file kl-files]
-      (println "Reading" file)
-      (process-file file))))
+  (let [contents     (mapv #(slurp (str kl-path %)) kl-files)
+        results      (mapv #(process-file %1 %2) contents kl-files)
+        declarations (mapcat first results)
+        output       (s/join "\n" (map second results))]
+    (write-declarations declarations)
+    (spit (str clj-path "clj-declarations.clj") output :append true)))

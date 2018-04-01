@@ -14,7 +14,7 @@
 
 (facts "(defun name vars body)"
        (fact (backend/kl->clj [] '(defun func (x) x)) => '(shen.primitives/set* (quote func)
-                                                                                (shen.primitives/curried-fn (quote ([x] x)))
+                                                                                (fn [x] x)
                                                                                 (quote shen.functions))))
 
 (facts "empty list"
@@ -22,17 +22,3 @@
 
 (fact "innocent symbols"
       (fact (backend/kl->clj [] 'bla) => '(quote bla)))
-
-;; WRAP
-
-(facts "cons?"
-       (fact (backend/wrap '(cons? X)) => '(boolean (not-empty X))))
-
-(facts "and"
-       (fact (backend/wrap '(and (cons? X) Y)) => '(and (boolean (not-empty X)) (shen-boolean Y))))
-
-(facts "not"
-       (fact (backend/wrap '(not X)) => '(not (shen-boolean X))))
-
-(future-fact "="
-       (fact (backend/wrap '(= X Y)) => '(not (shen-boolean X))))
