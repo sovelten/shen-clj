@@ -14,8 +14,14 @@
                      parser-grammar)))
 
 (def replacements
-  [[#"@" "-at-"]
-   [#"\." "-dot-"]])
+  [[#"@"  "-at-"]
+   [#"\." "-dot-"]
+   [#":"  "-colon-"]
+   [#"\{"  "-lcurlybrac-"]
+   [#"\}"  "-rcurlybrac-"]
+   [#";"  "-semicol-"]
+   [#"\["  "-lsqrbrac-"]
+   [#"\]"  "-rsqrbrac-"]])
 
 (defn replace-all
   [x replacements]

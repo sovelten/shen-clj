@@ -75,8 +75,8 @@
 
 (defn write-declarations
   [declarations]
-  (spit (str clj-path "clj-declarations.clj")
-        (str "(ns shen.functions)\n" (s/join "\n" (map symbol->declare-str declarations)))))
+  (spit (str clj-path "shen.clj")
+        (str "(in-ns 'shen.functions)\n" (s/join "\n" (map symbol->declare-str declarations)) "\n")))
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -84,6 +84,7 @@
   (let [contents     (mapv #(slurp (str kl-path %)) kl-files)
         results      (mapv #(process-file %1 %2) contents kl-files)
         declarations (mapcat first results)
-        output       (s/join "\n" (map second results))]
+        header       "(ns shen.shen)"
+        output       (s/join "\n" (cons header (map second results)))]
     (write-declarations declarations)
-    (spit (str clj-path "clj-declarations.clj") output :append true)))
+    (spit (str clj-path "shen.clj") output :append true)))

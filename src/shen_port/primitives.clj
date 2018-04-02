@@ -18,7 +18,7 @@
   (c/cons (vec params1)
           (if (empty? params2)
             body
-            (list (apply list 'fn (vec params2) body)))))
+            (list (apply list 'clojure.core/fn (vec params2) body)))))
 
 (defn ^:private do-curried [symbol to-fn params]
   (c/let [result (split-with (complement vector?) params)
@@ -35,11 +35,11 @@
 
 (defn curried-fn
   [params]
-  (eval (do-curried 'fn curry params)))
+  (eval (do-curried 'clojure.core/fn curry params)))
 
 (defmacro defn-curried
   [& params]
-  (do-curried 'defn curry params))
+  (do-curried 'clojure.core/defn curry params))
 
 
 ;;
@@ -231,14 +231,6 @@
   [ns & body]
   `(binding [*ns* (the-ns ~ns)]
      ~@(map (fn [form] `(eval '~form)) body)))
-
-(defmacro with-ns-2
-  "Evaluates body in another namespace.  ns is either a namespace
-  object or a symbol.  This makes it possible to define functions in
-  namespaces other than the current one."
-  [ns body]
-  `(binding [*ns* (the-ns ~ns)]
-     (eval '~body)))
 
 ;;
 ;; Informational
