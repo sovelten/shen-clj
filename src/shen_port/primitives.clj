@@ -41,7 +41,6 @@
   [& params]
   (do-curried 'clojure.core/defn curry params))
 
-
 ;;
 ;; Arithmetic
 ;;
@@ -220,10 +219,6 @@
 ;; General
 ;;
 
-(defn eval-kl
-  [X]
-  (eval (doto (backend/kl->clj [] X) println)))
-
 (defmacro with-ns
   "Evaluates body in another namespace.  ns is either a namespace
   object or a symbol.  This makes it possible to define functions in
@@ -231,6 +226,11 @@
   [ns & body]
   `(binding [*ns* (the-ns ~ns)]
      ~@(map (fn [form] `(eval '~form)) body)))
+
+(defn eval-kl
+  [X]
+  (binding [*ns* (the-ns 'shen.functions)]
+      (eval (doto (backend/kl->clj [] X) println))))
 
 ;;
 ;; Informational

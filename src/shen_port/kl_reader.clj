@@ -21,7 +21,8 @@
    [#"\}"  "-rcurlybrac-"]
    [#";"  "-semicol-"]
    [#"\["  "-lsqrbrac-"]
-   [#"\]"  "-rsqrbrac-"]])
+   [#"\]"  "-rsqrbrac-"]
+   [#","  "-comma-"]])
 
 (defn replace-all
   [x replacements]

@@ -1,10 +1,10 @@
 (ns shen-port.core
   (:gen-class)
-  (:use [clojure.java.io :only (file reader writer)]
-        [clojure.pprint :only (pprint)])
   (:require [clojure.string :as s]
             [shen-port.backend :as backend]
-            [shen-port.kl-reader :as kl-reader])
+            [shen-port.kl-reader :as kl-reader]
+            [shen-port.overwrite :as overwrite]
+            [clojure.string :as str])
   (:import [java.io StringReader PushbackReader FileNotFoundException]
            [java.util.regex Pattern]))
 
@@ -24,10 +24,24 @@
    "macros.kl"
    "declarations.kl"
    "t-star.kl"
-   "types.kl"])
+   "types-replace.kl"])
 
 (def kl-path "resources/klambda/")
 (def clj-path "resources/shen-clj/")
+
+(def overwrites #{'shen-dot-fillvector
+                  'shen-dot-aum_to_shen
+                  'shen-dot-aum_to_shen-aux
+                  'shen-dot-th*
+                  'shen-dot-t*-hyps})
+
+(defn overwrite->str
+  [x]
+  (pr-str @(ns-resolve (the-ns 'shen-port.overwrite) (symbol x))))
+
+(defn overwrites->str
+  []
+  (s/join "\n" (map #(overwrite->str %) overwrites)))
 
 (defn clj-filename
   [file]
@@ -59,32 +73,35 @@
   (let [header-str   (pr-str (header 'shen))
         forms-strs   (for [expr clj-exprs]
                        (if (string? expr)
-                         (str "(comment \"" expr "\")")
+                         (str "(clojure.core/comment \"" expr "\")")
                          (pr-str expr)))]
     (s/join "\n" forms-strs)))
 
 (defn process-file
   [content filename]
   (println "Reading" filename)
-  (let [kl-forms     (kl-reader/read-file content)
+  (let [kl-forms     (->> (kl-reader/read-file content)
+                          (remove #(contains? overwrites (function-name %))))
+        kl-forms'    (remove #(contains? overwrites (function-name %)))
         declarations (declarations kl-forms)
-        output-str   (to-str (map #(backend/kl->clj [] %) kl-forms))]
-    #_(spit (str clj-path (clj-filename file)) output-str)
-    #_(spit (str clj-path "clj-declarations.clj") output-str)
+        output-str   (str "(clojure.core/comment " filename ")\n"
+                          (to-str (map #(backend/kl->clj [] %) kl-forms)))]
     [declarations output-str]))
 
-(defn write-declarations
+(defn declarations->str
   [declarations]
-  (spit (str clj-path "shen.clj")
-        (str "(in-ns 'shen.functions)\n" (s/join "\n" (map symbol->declare-str declarations)) "\n")))
+  (str (s/join "\n" (map symbol->declare-str declarations)) "\n"))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
   (let [contents     (mapv #(slurp (str kl-path %)) kl-files)
         results      (mapv #(process-file %1 %2) contents kl-files)
-        declarations (mapcat first results)
-        header       "(ns shen.shen)"
-        output       (s/join "\n" (cons header (map second results)))]
-    (write-declarations declarations)
-    (spit (str clj-path "shen.clj") output :append true)))
+        header       (str "(ns shen.functions\n"
+                          "(:require [shen-port.primitives :refer :all])\n"
+                          "(:refer-clojure :only []))\n")
+        declarations (declarations->str (mapcat first results))
+        overwrites   (overwrites->str)
+        code         (s/join "\n" (map second results))
+        output       (s/join "\n" [header declarations overwrites code])]
+    (spit (str clj-path "shen.clj") output)))

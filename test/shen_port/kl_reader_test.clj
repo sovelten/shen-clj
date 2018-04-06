@@ -35,6 +35,7 @@
        (fact (kl-reader/read "/") => '/)
        (fact (kl-reader/read ":") => '-colon-)
        (fact (kl-reader/read ";") => '-semicol-)
+       (fact (kl-reader/read ",") => '-comma-)
        (fact (kl-reader/read "{") => '-lcurlybrac-)
        (fact (kl-reader/read "}") => '-rcurlybrac-)
        (fact (kl-reader/read "[") => '-lsqrbrac-)

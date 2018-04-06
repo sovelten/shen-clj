@@ -120,9 +120,7 @@
     (let [[fst & rest] expr
           fname (if (list? fst)
                   (kl->clj locals fst) ;TODO: what happens if this evaluates to a symbol?
-                  (if (some #{fst} locals)
-                    fst
-                    (function-symbol fst)))]
+                  fst)]
       (cons fname (for [arg rest]
                     (kl->clj locals arg))))
 
