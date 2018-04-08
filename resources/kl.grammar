@@ -1,0 +1,11 @@
+klexpr = <whitespace>* sexp
+<sexp> = number | string | symbol | list
+list = <lparen> <whitespace>* (sexp (<whitespace> sexp)*)? <whitespace>* <rparen>
+<token> = number | string | symbol
+<lparen> = #'\('
+<rparen> = #'\)'
+<quote> = #'\"'
+whitespace = #'[\s\n]+'
+number = #'-?[0-9]+(\.[0-9]+)?'
+string = <quote> #'(?s:[^\"]*)' <quote>
+symbol = !number !string #'[^\(\)\s]+'
