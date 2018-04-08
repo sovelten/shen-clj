@@ -1,7 +1,8 @@
 (ns shen-port.install
   (:require [shen-port.primitives :refer :all]
             [clojure.core :as c])
-  (:refer-clojure :only []))
+  (:refer-clojure :only [])
+  (:gen-class))
 
 (def shen-clj-filepath "resources/shen-clj/")
 
@@ -23,4 +24,5 @@
    "t-star.clj"
    "types.clj"])
 
-(c/load-file (c/str shen-clj-filepath "shen.clj"))
+(defn -main []
+  (c/load-file (c/str shen-clj-filepath "shen.clj")))

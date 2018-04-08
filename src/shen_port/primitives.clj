@@ -247,6 +247,17 @@
                            (c/str "get-time does not understand the parameter " time)))))
 
 ;;
+;; Globals
+;;
+
+(set '*language*        "Clojure")
+(set '*port*            "0.1")
+(set '*porters*         "Eric Velten de Melo")
+(set '*implementation*  "Clojure")
+(set '*release*         "1.9")
+(set '*os*              "Linux")
+
+;;
 ;; Function Declarations
 ;;
 

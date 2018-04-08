@@ -11,4 +11,6 @@
   :plugins [[lein-midje "3.2.1"]]
   :main ^:skip-aot shen-port.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}
+             :shen-clj {:main shen.functions}}
+  :aliases {"shen-clj" ["with-profile" "shen-clj" "run"]})

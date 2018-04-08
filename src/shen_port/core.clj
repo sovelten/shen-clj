@@ -27,7 +27,7 @@
    "types-replace.kl"])
 
 (def kl-path "resources/klambda/")
-(def clj-path "resources/shen-clj/")
+(def clj-path "src/shen-clj/")
 
 (def overwrites #{'shen-dot-fillvector
                   'shen-dot-aum_to_shen
@@ -103,5 +103,6 @@
         declarations (declarations->str (mapcat first results))
         overwrites   (overwrites->str)
         code         (s/join "\n" (map second results))
-        output       (s/join "\n" [header declarations overwrites code])]
+        main         "(clojure.core/defn -main [] (shen-dot-shen))"
+        output       (s/join "\n" [header declarations overwrites code main])]
     (spit (str clj-path "shen.clj") output)))
