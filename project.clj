@@ -9,7 +9,7 @@
                  [nubank/matcher-combinators "0.2.4"]
                  [instaparse "1.4.8"]]
   :plugins [[lein-midje "3.2.1"]]
-  :main ^:skip-aot shen-port.core
+  :main ^:skip-aot shen-port.install
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
              :shen-clj {:main shen.functions}}
