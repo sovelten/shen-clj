@@ -199,7 +199,8 @@
 
 (defn-curried write-byte
   [N stream]
-  (.write stream N))
+  (.write stream N)
+  (. stream (flush)))
 
 (defn read-byte
   [stream]
