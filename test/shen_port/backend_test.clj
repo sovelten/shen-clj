@@ -26,7 +26,5 @@
 
 (def code-sample '(V2856 (map (lambda Z (shen.walk V2856 Z)) V2857)))
 
-(fact (backend/kl->clj ['V2856 'V2857] code-sample) => '(V2856
-                                                         (shen.functions/map
-                                                          (clojure.core/fn [Z] (shen.functions/shen.walk V2856 Z))
-                                                          V2857)))
+
+(fact (backend/kl->clj ['V2856 'V2857] code-sample) => '(V2856 (map (clojure.core/fn [Z] (shen.walk V2856 Z)) V2857)))

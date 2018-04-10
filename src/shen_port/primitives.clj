@@ -3,7 +3,8 @@
             [clojure.java.io :as io]
             [shen-port.backend :as backend])
   (:import [java.util Arrays])
-  (:refer-clojure :only [fn defn case int symbol the-ns with-meta partial split-at inc range count concat]))
+  (:refer-clojure :exclude [set + - / * intern cons]))
+
 
 (c/create-ns 'shen.globals)
 (c/create-ns 'shen.functions)
@@ -198,7 +199,7 @@
 
 (defn-curried write-byte
   [N stream]
-  (.write stream 65))
+  (.write stream N))
 
 (defn read-byte
   [stream]
@@ -230,7 +231,7 @@
 (defn eval-kl
   [X]
   (c/binding [c/*ns* (the-ns 'shen.functions)]
-    (c/eval (c/doto (backend/kl->clj [] X) c/println))))
+    (c/eval (backend/kl->clj [] X))))
 
 ;;
 ;; Informational
