@@ -3,11 +3,11 @@
             [clojure.java.io :as io]
             [shen-port.backend :as backend])
   (:import [java.util Arrays])
-  (:refer-clojure :exclude [set intern cons + - / *]))
+  (:refer-clojure :only [fn defn case int symbol the-ns with-meta partial split-at inc range count concat]))
 
-(create-ns 'shen.globals)
-(create-ns 'shen.functions)
-(create-ns 'shen.primitives)
+(c/create-ns 'shen.globals)
+(c/create-ns 'shen.functions)
+(c/create-ns 'shen.primitives)
 
 ;;
 ;; Utils (currying)
@@ -15,29 +15,29 @@
 
 (defn ^:private curry
   [[params1 params2] body]
-  (c/cons (vec params1)
-          (if (empty? params2)
+  (c/cons (c/vec params1)
+          (if (c/empty? params2)
             body
-            (list (apply list 'clojure.core/fn (vec params2) body)))))
+            (c/list (c/apply c/list 'clojure.core/fn (c/vec params2) body)))))
 
 (defn ^:private do-curried [symbol to-fn params]
-  (c/let [result (split-with (complement vector?) params)
+  (c/let [result (c/split-with (c/complement c/vector?) params)
           [[name doc meta] [args & body]] result
           [doc meta] (if (c/string? doc) [doc meta] [nil doc])
           body (if meta (c/cons meta body) body)
-          arity-for-n #(-> % inc (split-at args) (to-fn body))
-          arities (->>
+          arity-for-n #(c/-> % inc (split-at args) (to-fn body))
+          arities (c/->>
                    (range 0 (count args))
-                   (map arity-for-n)
-                   reverse)
-          before (keep identity [symbol name doc])]
+                   (c/map arity-for-n)
+                   c/reverse)
+          before (c/keep c/identity [symbol name doc])]
     (concat before arities)))
 
 (defn curried-fn
   [params]
-  (eval (do-curried 'clojure.core/fn curry params)))
+  (c/eval (do-curried 'clojure.core/fn curry params)))
 
-(defmacro defn-curried
+(c/defmacro defn-curried
   [& params]
   (do-curried 'clojure.core/defn curry params))
 
@@ -103,8 +103,8 @@
   ([X Y] (set* X Y 'shen.globals)))
 
 (defn ^:private value* [X ns]
-  (c/let [v (c/and (symbol? X) (ns-resolve ns X))]
-    (if (nil? v)
+  (c/let [v (c/and (c/symbol? X) (c/ns-resolve ns X))]
+    (if (c/nil? v)
       (throw (IllegalArgumentException. (c/str "variable " X " has no value")))
       @v)))
 
@@ -116,23 +116,23 @@
 
 (defn-curried pos
   [X N]
-  (c/str (get X N)))
+  (c/str (c/get X N)))
 
 (defn tlstr
   [X]
-  (subs X 1))
+  (c/subs X 1))
 
 (defn-curried cn
   [Str1 Str2]
-  (str Str1 Str2))
+  (c/str Str1 Str2))
 
 (defn string->n
   [S]
-  (c/int (first S)))
+  (c/int (c/first S)))
 
 (defn n->string
   [N]
-  (c/str (char N)))
+  (c/str (c/char N)))
 
 ;;
 ;; Vectors
@@ -141,16 +141,16 @@
 (def ^:private array-class (Class/forName "[Ljava.lang.Object;"))
 
 (defn absvector [N]
-  (doto (object-array (int N)) (Arrays/fill 'fail!)))
+  (c/doto (c/object-array (int N)) (Arrays/fill 'fail!)))
 
 (defn absvector? [X]
-  (identical? array-class (c/class X)))
+  (c/identical? array-class (c/class X)))
 
 (defn <-address [#^"[Ljava.lang.Object;" Vector N]
-  (aget Vector (int N)))
+  (c/aget Vector (int N)))
 
 (defn address-> [#^"[Ljava.lang.Object;" Vector N Value]
-  (aset Vector (int N) Value)
+  (c/aset Vector (int N) Value)
   Vector)
 
 ;;
@@ -159,42 +159,42 @@
 
 (defn pair?
   [X]
-  (c/and (vector? X) (= 2 (count X))))
+  (c/and (c/vector? X) (c/= 2 (count X))))
 
 (defn cons?
   [X]
-  (boolean (c/or (c/and (seq? X) (not-empty X))
-                 (c/and (vector? X) (= 2 (count X))))))
+  (c/boolean (c/or (c/and (c/seq? X) (c/not-empty X))
+                 (c/and (c/vector? X) (c/= 2 (count X))))))
 
 (defn-curried cons
   [X Y]
-  (cond
+  (c/cond
     (cons? Y) (if (pair? Y)
-                (list X Y)
+                (c/list X Y)
                 (c/cons X Y))
-    (= () Y)  (c/cons X Y)
-    :else     (vector X Y)))
+    (c/= () Y)  (c/cons X Y)
+    :else     (c/vector X Y)))
 
 (defn hd
   [X]
   (if (cons? X)
-    (first X)
+    (c/first X)
     (simple-error "Not a cons")))
 
 (defn tl
   [X]
   (if (cons? X)
     (if (pair? X)
-      (second X)
-      (rest X))
+      (c/second X)
+      (c/rest X))
     (simple-error "Not a cons")))
 
 ;;
 ;; Streams
 ;;
 
-(set '*stinput* *in*)
-(set '*stoutput* *out*)
+(set '*stinput* c/*in*)
+(set '*stoutput* c/*out*)
 
 (defn-curried write-byte
   [N stream]
@@ -206,9 +206,9 @@
 
 (defn-curried open
   [file mode]
-  (cond
-    (= 'out mode) (io/writer file)
-    (= 'in mode)  (io/input-stream file)
+  (c/cond
+    (c/= 'out mode) (io/writer file)
+    (c/= 'in mode)  (io/input-stream file)
     :else         (simple-error "Wrong opening mode")))
 
 (defn close
@@ -219,18 +219,18 @@
 ;; General
 ;;
 
-(defmacro with-ns
+(c/defmacro with-ns
   "Evaluates body in another namespace.  ns is either a namespace
   object or a symbol.  This makes it possible to define functions in
   namespaces other than the current one."
   [ns & body]
-  `(binding [*ns* (the-ns ~ns)]
-     ~@(map (fn [form] `(eval '~form)) body)))
+  `(c/binding [c/*ns* (the-ns ~ns)]
+     ~@(c/map (fn [form] `(c/eval '~form)) body)))
 
 (defn eval-kl
   [X]
-  (binding [*ns* (the-ns 'shen.functions)]
-      (eval (doto (backend/kl->clj [] X) println))))
+  (c/binding [c/*ns* (the-ns 'shen.functions)]
+    (c/eval (c/doto (backend/kl->clj [] X) c/println))))
 
 ;;
 ;; Informational
@@ -240,9 +240,9 @@
 
 (defn get-time
   [time]
-  (cond
-    (= time 'run)  (/ (- (System/currentTimeMillis) internal-start-time) 1000)
-    (= time 'unix) (long (/ (System/currentTimeMillis) 1000))
+  (c/cond
+    (c/= time 'run)  (/ (- (System/currentTimeMillis) internal-start-time) 1000)
+    (c/= time 'unix) (c/long (/ (System/currentTimeMillis) 1000))
     :else          (throw (IllegalArgumentException.
                            (c/str "get-time does not understand the parameter " time)))))
 
@@ -288,7 +288,7 @@
 (set* 'pos #'pos 'shen.functions)
 (set* 'tlstr #'tlstr 'shen.functions)
 (set* 'cn #'cn 'shen.functions)
-(set* 'str #'str 'shen.functions)
+(set* 'str #'c/str 'shen.functions)
 (set* 'string->n #'string->n 'shen.functions)
 (set* 'n->string #'n->string 'shen.functions)
 (set* 'absvector #'absvector 'shen.functions)
@@ -299,9 +299,9 @@
 (set* 'cons #'cons 'shen.functions)
 (set* 'hd #'hd 'shen.functions)
 (set* 'tl #'tl 'shen.functions)
-(set* '= #'= 'shen.functions)
+(set* '= #'c/= 'shen.functions)
 (set* 'eval-kl #'eval-kl 'shen.functions)
-(set* 'boolean? #'boolean? 'shen.functions)
+(set* 'boolean? #'c/boolean? 'shen.functions)
 (set* 'read-byte #'read-byte 'shen.functions)
 (set* 'write-byte #'write-byte 'shen.functions)
 (set* 'open #'open 'shen.functions)

@@ -10,7 +10,6 @@
   '(with-ns 'shen.functions
      (clojure.core/defn shen-dot-fillvector
        ([Vec pos c d]
-        (clojure.core/println pos)
         (clojure.core/cond (= c pos) (address-> Vec c d)
                            :else   (recur (address-> Vec pos d) (+ 1 pos) c d)))
        ([Vec pos c]
@@ -45,7 +44,7 @@
                               V3749 V3
                               V3750 V4
                               V3751 V5]
-         (clojure.core/eval (clojure.core/read-string (clojure.core/slurp "resources/shen-clj/shen-dot-th*")))))))
+         (clojure.core/eval (clojure.core/read-string (clojure.core/slurp "resources/shen-dot-th*")))))))
 
 (def shen-dot-t*-hyps
   '(shen-port.primitives/with-ns
@@ -60,5 +59,4 @@
                               V3757 V2
                               V3758 V3
                               V3759 V4]
-         (clojure.core/eval (clojure.core/read-string (clojure.core/slurp "resources/shen-clj/shen-dot-th*")))))))
-
+         (clojure.core/eval (clojure.core/read-string (clojure.core/slurp "resources/shen-dot-t*-hyps")))))))
