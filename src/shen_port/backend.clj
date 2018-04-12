@@ -116,9 +116,9 @@
     (= '() expr)
     '()
 
-    (list? expr)
+    (seq? expr)
     (let [[fst & rest] expr
-          fname (if (list? fst)
+          fname (if (seq? fst)
                   (kl->clj locals fst) ;TODO: what happens if this evaluates to a symbol?
                   fst)]
       (cons fname (for [arg rest]

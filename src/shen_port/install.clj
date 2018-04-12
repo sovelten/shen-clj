@@ -97,7 +97,7 @@
   (let [contents     (mapv #(slurp (str kl-path %)) kl-files)
         results      (mapv #(process-file %1 %2) contents kl-files)
         header       (str "(ns shen.functions\n"
-                          "(:require [shen-port.primitives :refer :all])\n"
+                          "(:require [shen-port.primitives :as p])\n"
                           "(:refer-clojure :only []))\n")
         declarations (declarations->str (mapcat first results))
         overwrites   (overwrites->str)

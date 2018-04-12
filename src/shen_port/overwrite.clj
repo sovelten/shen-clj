@@ -7,7 +7,7 @@
 ;;
 
 (def shen-dot-fillvector
-  '(with-ns 'shen.functions
+  '(shen-port.primitives/with-ns 'shen.functions
      (clojure.core/defn shen-dot-fillvector
        ([Vec pos c d]
         (clojure.core/cond (= c pos) (address-> Vec c d)

@@ -7,8 +7,8 @@
        (fact (backend/kl->clj [] '(type x y)) => '(quote x)))
 
 (facts "Locals [lambda X Y] -> (let ChX (ch-T X) (protect [FUNCTION [LAMBDA [ChX] (kl-to-lisp [ChX | Locals] (SUBST ChX X Y))]]))"
-       (fact (backend/kl->clj [] '(lambda x x)) => '(clojure.core/fn [x] x)))
-
+       (fact (backend/kl->clj [] '(lambda x x)) => '(clojure.core/fn [x] x))
+       (fact (backend/kl->clj [] '((lambda x x) 4)) => '((clojure.core/fn [x] x) 4)))
 
 (facts "(let x y z)"
        (fact (backend/kl->clj [] '(let x 5 z)) => '(clojure.core/let [x 5] (quote z))))

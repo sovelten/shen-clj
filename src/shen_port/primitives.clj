@@ -1,7 +1,8 @@
 (ns shen-port.primitives
   (:require [clojure.core :as c]
             [clojure.java.io :as io]
-            [shen-port.backend :as backend])
+            [shen-port.backend :as backend]
+            [shen-port.kl-reader :as kl-reader])
   (:import [java.util Arrays])
   (:refer-clojure :exclude [set + - / * intern cons]))
 
@@ -41,6 +42,10 @@
 (c/defmacro defn-curried
   [& params]
   (do-curried 'clojure.core/defn curry params))
+
+(c/defmacro lambda
+  [X Y]
+  `(fn [X] ~Y))
 
 ;;
 ;; Arithmetic
@@ -92,15 +97,17 @@
   (case str
     "true" true
     "false" false
-    (symbol str)))
+    (kl-reader/kl-symbol str)))
+
+(kl-reader/replace-all "/." kl-reader/replacements)
 
 (defn set* [X Y ns]
   @(c/intern (the-ns ns)
              (with-meta X {:dynamic true :declared true})
              Y))
 
-(defn set
-  ([X] (partial set X))
+(defn internal-set
+  ([X] (partial internal-set X))
   ([X Y] (set* X Y 'shen.globals)))
 
 (defn ^:private value* [X ns]
@@ -194,8 +201,8 @@
 ;; Streams
 ;;
 
-(set '*stinput* c/*in*)
-(set '*stoutput* c/*out*)
+(internal-set '*stinput* c/*in*)
+(internal-set '*stoutput* c/*out*)
 
 (defn-curried write-byte
   [N stream]
@@ -231,8 +238,9 @@
 
 (defn eval-kl
   [X]
+  (println "expr:" X)
   (c/binding [c/*ns* (the-ns 'shen.functions)]
-    (c/eval (backend/kl->clj [] X))))
+    (c/eval (doto (backend/kl->clj [] X) c/println))))
 
 ;;
 ;; Informational
@@ -252,12 +260,12 @@
 ;; Globals
 ;;
 
-(set '*language*        "Clojure")
-(set '*port*            "0.1")
-(set '*porters*         "Eric Velten de Melo")
-(set '*implementation*  "Clojure")
-(set '*release*         "1.9")
-(set '*os*              "Linux")
+(internal-set '*language*        "Clojure")
+(internal-set '*port*            "0.1")
+(internal-set '*porters*         "Eric Velten de Melo")
+(internal-set '*implementation*  "Clojure 1.9.0")
+(internal-set '*release*         "1.9")
+(internal-set '*os*              "Linux")
 
 ;;
 ;; Function Declarations
@@ -271,7 +279,7 @@
 (set* 'ifp #'ifp 'shen.primitives)
 
 ;; KL Functions
-(set* 'set #'set 'shen.functions)
+(set* 'set #'internal-set 'shen.functions)
 (set* 'value #'value 'shen.functions)
 (set* '+ #'+ 'shen.functions)
 (set* '- #'- 'shen.functions)
@@ -280,7 +288,6 @@
 (set* 'simple-error #'simple-error 'shen.functions)
 (set* 'error-to-string #'error-to-string 'shen.functions)
 (set* 'intern #'intern 'shen.functions)
-(set* 'symbol? #'c/symbol? 'shen.functions)
 (set* 'number? #'c/number? 'shen.functions)
 (set* '> #'c/> 'shen.functions)
 (set* '>= #'c/>= 'shen.functions)
