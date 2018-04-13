@@ -37,7 +37,10 @@
 
 (defn kl-symbol
   [x]
-  (symbol (replace-all (replace-slash x) replacements)))
+  (case x
+    "true"  true
+    "false" false
+    (symbol (replace-all (replace-slash x) replacements))))
 
 (def transform-options
   {:number read-string

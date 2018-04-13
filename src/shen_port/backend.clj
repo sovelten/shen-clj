@@ -35,6 +35,21 @@
               (into [] vars)
               (kl->clj vars body))))
 
+(defn undeclared [locals code]
+  (->> code
+       flatten
+       (filter symbol?)
+       (remove (fn [x] (some #{x} locals)))
+       (remove resolve)
+       distinct))
+
+(defn auto-declare
+  [locals code]
+  (let [to-declare (undeclared (conj locals 'quote 'true 'false) code)]
+    (if (not-empty to-declare)
+      (list 'do (cons 'clojure.core/declare to-declare) code)
+      code)))
+
 (defn kl->clj
   [locals expr]
   (cond
@@ -48,7 +63,7 @@
     ; Locals [lambda X Y] -> (let ChX (ch-T X) (protect [FUNCTION [LAMBDA [ChX] (kl-to-lisp [ChX | Locals] (SUBST ChX X Y))]]))
     (match? expr (['lambda _ _] :seq))
     (let [[_ x y] expr]
-      (list 'clojure.core/fn [x] (kl->clj (conj locals x) y)))
+      (auto-declare (conj locals x) (list 'clojure.core/fn [x] (kl->clj (conj locals x) y))))
 
     ; Locals [let X Y Z] -> (let ChX (ch-T X) (protect [LET [[ChX (kl-to-lisp Locals Y)]] (kl-to-lisp [ChX | Locals] (SUBST ChX X Z))]))
     (match? expr (['let _ _ _] :seq))
@@ -63,14 +78,14 @@
         (curried-fn name vars body)))
 
     ; Locals [cond | Cond] -> (protect [COND | (MAPCAR (/. C (cond_code Locals C)) Cond)])
-    (and (list? expr) (= (first expr) 'cond))
+    (and (seq? expr) (= (first expr) 'cond))
     (let [[_ & clauses] expr
           clauses' (concat clauses '((:else "TODO")))
           clauses'' (mapcat (fn [[test body]]
                               (list (kl->clj locals test) (kl->clj locals body))) clauses')]
       (cons 'clojure.core/cond clauses''))
 
-    (and (list? expr) (= (first expr) 'do))
+    (and (seq? expr) (= (first expr) 'do))
     (let [[_ & exprs] expr]
       (cons 'do (for [each exprs]
                   (kl->clj locals each))))

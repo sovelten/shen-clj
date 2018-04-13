@@ -62,4 +62,7 @@
 
 (facts "read-file"
        (fact (kl-reader/read-file "\n\n(+ 1 2)\n\n (+ 4 5)\n")
-             => '((+ 1 2) (+ 4 5))))
+             => '((+ 1 2) (+ 4 5)))
+
+       (fact (kl-reader/read-file "(lambda X true)")
+             => '((lambda X true))))

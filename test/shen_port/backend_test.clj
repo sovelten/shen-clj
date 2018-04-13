@@ -18,13 +18,25 @@
                                                             (quote shen.functions)
                                                             (clojure.core/defn func [x] x))))
 
+
+(facts "forward declaration"
+       (fact (backend/undeclared [] '(a b c)) => '(a b c))
+       (fact (backend/undeclared ['a] '(a b c)) => '(b c))
+
+
+       (fact (backend/undeclared ['x] '(fn [x] (+ x blargh))) => '(blargh))
+
+       (fact (backend/auto-declare ['x] '(fn [x] (+ x blargh))) => '(do (clojure.core/declare blargh)
+                                                                        (fn [x] (+ x blargh))))
+
+       (fact (backend/kl->clj [] '(lambda X true)) => '(clojure.core/fn [X] true)))
+
 (facts "empty list"
        (fact (backend/kl->clj [] '()) => '()))
 
 (fact "innocent symbols"
       (fact (backend/kl->clj [] 'bla) => '(quote bla)))
 
-(def code-sample '(V2856 (map (lambda Z (shen.walk V2856 Z)) V2857)))
+(def code-sample '(V2856 (map (lambda Z (shen-dot-walk V2856 Z)) V2857)))
 
-
-(fact (backend/kl->clj ['V2856 'V2857] code-sample) => '(V2856 (map (clojure.core/fn [Z] (shen.walk V2856 Z)) V2857)))
+(fact (backend/kl->clj ['V2856 'V2857] code-sample) => '(V2856 (map (do (clojure.core/declare shen-dot-walk) (clojure.core/fn [Z] (shen-dot-walk V2856 Z))) V2857)))

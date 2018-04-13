@@ -25,14 +25,25 @@
        (fact (p/eval-kl '()) => ()))
 
 (facts "on lambda"
-       (fact (p/eval-kl '((lambda X (+ X X)) 2)) => 4))
+       (fact (p/eval-kl '((lambda X (+ X X)) 2)) => 4)
+
+       (fact "forward declare" (p/eval-kl '(lambda X (not-declared X))) => ifn?))
 
 (facts "on defun"
        (fact (p/eval-kl '(do (defun func (x) (+ x 2)) (func 5))) => 7)
        (fact (p/eval-kl '(defun func (x y) (+ x y))) => ifn?)
        (fact (p/eval-kl '(func 3 4)) => 7)
        (fact (p/eval-kl '(func 3)) => ifn?)
-       (fact "currying" (p/eval-kl '((func 3) 4)) => 7))
+       (fact "currying" (p/eval-kl '((func 3) 4)) => 7)
+
+       (fact "recursion" (p/eval-kl '(do (defun recursive (x) (if (= x 0) 0 (recursive (- x 1))))
+                                         (recursive 10))) => 0)
+
+       (fact "recursion" (p/eval-kl '(do (defun recursive-2 (x y) (if (= y 0) x (recursive-2 (+ x x) (- y 1))))
+                                         (recursive-2 1 2))) => 4))
+
+
+
 
 (facts "on let"
        (fact (p/eval-kl '(let X 4 (+ X 2))) => 6))
@@ -163,3 +174,9 @@
 (facts "time"
        (fact (p/eval-kl '(get-time run)) => number?)
        (fact (p/eval-kl '(get-time unix)) => number?))
+
+(def code-2 '(defun f (V226) (cond ((= 0 V226) 1) ((= 1 V226) 0) (true (shen-dot-f_error f)))))
+
+
+(facts "sample"
+       (fact (p/eval-kl code-2) => #'shen.functions/f))
