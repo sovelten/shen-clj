@@ -1,57 +1,15 @@
-# shen-port
+# Shen-clj
 
-A Clojure port of the Shen Language
+A Clojure port of the Shen Language (https://github.com/Shen-Language/shen-sources)
 
-# Status
+## Status
 
-## Primitives
+Not fully working yet. The Repl loads and we can execute most instructions.
 
-Progress: 47/47
+## Generating Clojure source
 
-- [X] set
-- [X] value
-- [X] lambda
-- [X] eval-kl
-- [X] defun
-- [X] +
-- [X] -
-- [X] /
-- [X] *
-- [X] freeze
-- [X] and
-- [X] or
-- [X] let
-- [X] if
-- [X] cond
-- [X] trap-error
-- [X] simple-error
-- [X] error-to-string
-- [X] intern
-- [X] symbol?
-- [X] number?
-- [X] >
-- [X] <
-- [X] >=
-- [X] <=
-- [X] string?
-- [X] cn
-- [X] pos
-- [X] tlstr
-- [X] string->n
-- [X] n->string
-- [X] str
-- [X] absvector
-- [X] absvector?
-- [X] address->
-- [X] <-address
-- [X] cons?
-- [X] cons
-- [X] hd
-- [X] tl
-- [X] read-byte
-- [X] write-byte
-- [X] open
-- [X] close
-- [X] boolean?
-- [X] get-time
-- [X] type
+To generate the clojure source from the KLambda source, run `lein run`. This will overwrite `src/shen/functions.clj`
+
+## Running
+
+To run the shen repl just run `lein shen-clj`
