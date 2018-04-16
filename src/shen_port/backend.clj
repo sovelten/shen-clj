@@ -80,7 +80,7 @@
     ; Locals [cond | Cond] -> (protect [COND | (MAPCAR (/. C (cond_code Locals C)) Cond)])
     (and (seq? expr) (= (first expr) 'cond))
     (let [[_ & clauses] expr
-          clauses' (concat clauses '((:else "TODO")))
+          clauses' (concat clauses '((:else (throw (Exception. "No matching cond clause")))))
           clauses'' (mapcat (fn [[test body]]
                               (list (kl->clj locals test) (kl->clj locals body))) clauses')]
       (cons 'clojure.core/cond clauses''))
@@ -134,7 +134,7 @@
     (seq? expr)
     (let [[fst & rest] expr
           fname (if (seq? fst)
-                  (kl->clj locals fst) ;TODO: what happens if this evaluates to a symbol?
+                  (kl->clj locals fst)
                   fst)]
       (cons fname (for [arg rest]
                     (kl->clj locals arg))))
