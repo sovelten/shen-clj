@@ -39,11 +39,12 @@
        (def ^:dynamic V3749)
        (def ^:dynamic V3750)
        (def ^:dynamic V3751)
-       (clojure.core/binding [V3747 V1
-                              V3748 V2
-                              V3749 V3
-                              V3750 V4
-                              V3751 V5]
+       (clojure.core/binding [V3693 V1
+                              V3694 V2
+                              V3695 V3
+                              V3696 V4
+                              V3697 V5
+                              clojure.core/*ns* (clojure.core/the-ns 'shen.functions)]
          (clojure.core/eval (clojure.core/read-string (clojure.core/slurp "resources/shen-dot-th*")))))))
 
 (def shen-dot-t*-hyps

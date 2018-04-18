@@ -26,8 +26,8 @@
 
 (facts "on lambda"
        (fact (p/eval-kl '((lambda X (+ X X)) 2)) => 4)
-
-       (fact "forward declare" (p/eval-kl '(lambda X (not-declared X))) => ifn?))
+       (fact "forward declare" (p/eval-kl '(lambda X (not-declared X))) => ifn?)
+       (fact "bound vars" (p/eval-kl '((lambda X (let BLA 5 (+ X BLA))) 3)) => 8))
 
 (facts "on defun"
        (fact (p/eval-kl '(do (defun func (x) (+ x 2)) (func 5))) => 7)
@@ -40,10 +40,12 @@
                                          (recursive 10))) => 0)
 
        (fact "recursion" (p/eval-kl '(do (defun recursive-2 (x y) (if (= y 0) x (recursive-2 (+ x x) (- y 1))))
-                                         (recursive-2 1 2))) => 4))
+                                         (recursive-2 1 2))) => 4)
 
-
-
+       (fact "forward declaration"
+             (p/eval-kl '(do (defun func (x) (will-declare x))
+                             (defun will-declare (x) (+ x 5))
+                             (func 4))) => 9))
 
 (facts "on let"
        (fact (p/eval-kl '(let X 4 (+ X 2))) => 6))
@@ -73,10 +75,11 @@
        (fact (p/eval-kl '((if false 5) 2)) => 2))
 
 (facts "cond"
-       ;TODO: Throw exception for default and don't accept truthy values
+       ;TODO: Don't accept truthy values
        (fact (p/eval-kl '(cond (true 4))) => 4)
        (fact (p/eval-kl '(cond (false 4)
                                (true 5))) => 5)
+
        (fact (p/eval-kl '(cond (false 4)
                                (false 5))) => (throws "No matching cond clause")))
 

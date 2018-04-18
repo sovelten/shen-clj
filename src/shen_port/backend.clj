@@ -1,5 +1,10 @@
 (ns shen-port.backend
-  (:require [clojure.core.match :refer [match]]))
+  (:require [clojure.core.match :refer [match]]
+            [clojure.tools.analyzer.jvm :as ana.jvm]
+            [clojure.tools.analyzer.passes.jvm.emit-form :as e]))
+
+(fn [x] (do (def pomba)
+            (pomba x)))
 
 (defmacro match?
   [vars clause]
@@ -16,15 +21,39 @@
   (symbol (str "shen.primitives/" x)))
 
 (declare kl->clj)
+(create-ns 'shen.functions)
+
+(def free-vars (atom #{}))
+
+(defn unresolvable-handler
+  [_ x _]
+  (swap! free-vars conj x)
+  nil)
+
+(defn declare-unresolvable-symbols
+  [locals form]
+  (reset! free-vars [])
+  (ana.jvm/analyze form
+                   (assoc (ana.jvm/empty-env)
+                          :ns (the-ns 'shen.functions))
+                   {:passes-opts (assoc ana.jvm/default-passes-opts
+                                        :validate/unresolvable-symbol-handler
+                                        unresolvable-handler)})
+  (let [free-vars' (remove (fn [x] (some #{x} locals)) @free-vars)]
+    (if (not-empty free-vars')
+      (list 'do
+            (cons 'clojure.core/declare free-vars')
+            form)
+      form)))
 
 (defn uncurried-fn
   [name vars body]
   (list 'shen-port.primitives/with-ns
         (list 'quote 'shen.functions)
-        (list 'clojure.core/defn
-              name
-              (into [] vars)
-              (kl->clj vars body))))
+        (declare-unresolvable-symbols [] (list 'clojure.core/defn
+                                               name
+                                               (into [] vars)
+                                               (kl->clj vars body)))))
 
 (defn curried-fn
   [name vars body]
@@ -50,6 +79,17 @@
       (list 'do (cons 'clojure.core/declare to-declare) code)
       code)))
 
+(defn maybe-declare-fn
+  [locals expr]
+  (let [fname (first expr)]
+    (if (and (symbol? fname)
+             (not (boolean (some #{fname} locals)))
+             (not (resolve fname)))
+      (list 'do
+            (list 'def fname)
+            expr)
+      expr)))
+
 (defn kl->clj
   [locals expr]
   (cond
@@ -63,7 +103,7 @@
     ; Locals [lambda X Y] -> (let ChX (ch-T X) (protect [FUNCTION [LAMBDA [ChX] (kl-to-lisp [ChX | Locals] (SUBST ChX X Y))]]))
     (match? expr (['lambda _ _] :seq))
     (let [[_ x y] expr]
-      (auto-declare (conj locals x) (list 'clojure.core/fn [x] (kl->clj (conj locals x) y))))
+      (declare-unresolvable-symbols locals (list 'clojure.core/fn [x] (kl->clj (conj locals x) y))))
 
     ; Locals [let X Y Z] -> (let ChX (ch-T X) (protect [LET [[ChX (kl-to-lisp Locals Y)]] (kl-to-lisp [ChX | Locals] (SUBST ChX X Z))]))
     (match? expr (['let _ _ _] :seq))

@@ -23,13 +23,19 @@
        (fact (backend/undeclared [] '(a b c)) => '(a b c))
        (fact (backend/undeclared ['a] '(a b c)) => '(b c))
 
-
        (fact (backend/undeclared ['x] '(fn [x] (+ x blargh))) => '(blargh))
 
        (fact (backend/auto-declare ['x] '(fn [x] (+ x blargh))) => '(do (clojure.core/declare blargh)
                                                                         (fn [x] (+ x blargh))))
 
-       (fact (backend/kl->clj [] '(lambda X true)) => '(clojure.core/fn [X] true)))
+       (fact (backend/kl->clj [] '(lambda X true)) => '(clojure.core/fn [X] true))
+
+
+       (fact (backend/kl->clj [] '(defun func (x) (will-declare-2 x))) => '(shen-port.primitives/with-ns (quote shen.functions)
+                                                                             (do (clojure.core/declare will-declare-2)
+                                                                                 (clojure.core/defn func [x] (will-declare-2 x)))))
+
+       #_(fact (backend/kl->clj [] '(lambda X (let M 5 (+ X M)))) => '(clojure.core/fn [X] true)))
 
 (facts "empty list"
        (fact (backend/kl->clj [] '()) => '()))

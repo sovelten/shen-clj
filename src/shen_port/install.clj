@@ -24,7 +24,7 @@
    "macros.kl"
    "declarations.kl"
    "t-star.kl"
-   "types-replace.kl"])
+   "types.kl"])
 
 (def kl-path "resources/klambda/")
 (def clj-path "src/shen/")
@@ -32,8 +32,8 @@
 (def overwrites #{'shen-dot-fillvector
                   'shen-dot-aum_to_shen
                   'shen-dot-aum_to_shen-aux
-                  'shen-dot-th*
-                  'shen-dot-t*-hyps})
+                  #_'shen-dot-th*
+                  #_'shen-dot-t*-hyps})
 
 (defn overwrite->str
   [x]
