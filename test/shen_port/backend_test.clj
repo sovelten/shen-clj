@@ -33,9 +33,7 @@
 
        (fact (backend/kl->clj [] '(defun func (x) (will-declare-2 x))) => '(shen-port.primitives/with-ns (quote shen.functions)
                                                                              (do (clojure.core/declare will-declare-2)
-                                                                                 (clojure.core/defn func [x] (will-declare-2 x)))))
-
-       #_(fact (backend/kl->clj [] '(lambda X (let M 5 (+ X M)))) => '(clojure.core/fn [X] true)))
+                                                                                 (clojure.core/defn func [x] (will-declare-2 x))))))
 
 (facts "empty list"
        (fact (backend/kl->clj [] '()) => '()))
@@ -45,4 +43,4 @@
 
 (def code-sample '(V2856 (map (lambda Z (shen-dot-walk V2856 Z)) V2857)))
 
-(fact (backend/kl->clj ['V2856 'V2857] code-sample) => '(V2856 (map (do (clojure.core/declare shen-dot-walk) (clojure.core/fn [Z] (shen-dot-walk V2856 Z))) V2857)))
+(fact (backend/kl->clj ['V2856 'V2857] code-sample) => '((shen.primitives/resolve-fn V2856) (map (do (clojure.core/declare shen-dot-walk) (clojure.core/fn [Z] (shen-dot-walk V2856 Z))) V2857)))

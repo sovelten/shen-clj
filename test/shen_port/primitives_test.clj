@@ -170,6 +170,7 @@
        #_(fact (p/eval-kl '(symbol? (intern "false"))) => false)
        #_(fact "lambda" (p/eval-kl '(symbol? (lambda X X))) => false)
 
+
        #_(fact (p/eval-kl '(symbol? (value *stinput*))) => false)
        #_(fact (p/eval-kl '(trap-error (simple-error "") (lambda E (symbol? E)))) => false)
        #_(fact (p/eval-kl '(symbol? ())) => false))

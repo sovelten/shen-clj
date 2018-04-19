@@ -256,6 +256,12 @@
     :else          (throw (IllegalArgumentException.
                            (c/str "get-time does not understand the parameter " time)))))
 
+(defn resolve-fn
+  [x]
+  (if (c/symbol? x)
+    (or (ns-resolve 'shen.functions x) (throw (Exception. (str "Can't call symbol" x))))
+    x))
+
 ;;
 ;; Globals
 ;;
@@ -277,6 +283,7 @@
 (set* 'andp #'andp 'shen.primitives)
 (set* 'orp #'orp 'shen.primitives)
 (set* 'ifp #'ifp 'shen.primitives)
+(set* 'resolve-fn #'resolve-fn 'shen.primitives)
 
 ;; KL Functions
 (set* 'set #'internal-set 'shen.functions)

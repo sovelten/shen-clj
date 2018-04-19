@@ -90,11 +90,15 @@
             expr)
       expr)))
 
+(defn member?
+  [S X]
+  (some #{X} S))
+
 (defn kl->clj
   [locals expr]
   (cond
 
-    (some #{expr} locals) expr
+    (member? locals expr) expr
 
     ; Locals [type X _] -> (kl-to-lisp Locals X)
     (match? expr (['type _ _] :seq))
@@ -174,9 +178,12 @@
     (seq? expr)
     (let [[fst & rest] expr
           fname (if (seq? fst)
-                  (kl->clj locals fst)
-                  fst)]
-      (cons fname (for [arg rest]
+                  (list 'shen.primitives/resolve-fn (kl->clj locals fst))
+                  fst)
+          call-name (if (member? locals fname)
+                      (list 'shen.primitives/resolve-fn fname)
+                      fname)]
+      (cons call-name (for [arg rest]
                     (kl->clj locals arg))))
 
     ; _ S -> (protect [QUOTE S])  where (protect (= (SYMBOLP S) T))
