@@ -8,7 +8,7 @@
 
 (facts "Locals [lambda X Y] -> (let ChX (ch-T X) (protect [FUNCTION [LAMBDA [ChX] (kl-to-lisp [ChX | Locals] (SUBST ChX X Y))]]))"
        (fact (backend/kl->clj [] '(lambda x x)) => '(clojure.core/fn [x] x))
-       (fact (backend/kl->clj [] '((lambda x x) 4)) => '((clojure.core/fn [x] x) 4)))
+       (fact (backend/kl->clj [] '((lambda x x) 4)) => '((shen.primitives/resolve-fn (clojure.core/fn [x] x)) 4)))
 
 (facts "(let x y z)"
        (fact (backend/kl->clj [] '(let x 5 z)) => '(clojure.core/let [x 5] (quote z))))
@@ -21,6 +21,7 @@
 
 (facts "forward declaration"
        (fact (backend/undeclared [] '(a b c)) => '(a b c))
+
        (fact (backend/undeclared ['a] '(a b c)) => '(b c))
 
        (fact (backend/undeclared ['x] '(fn [x] (+ x blargh))) => '(blargh))

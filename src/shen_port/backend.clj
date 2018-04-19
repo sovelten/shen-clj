@@ -177,13 +177,14 @@
 
     (seq? expr)
     (let [[fst & rest] expr
-          fname (if (seq? fst)
-                  (list 'shen.primitives/resolve-fn (kl->clj locals fst))
-                  fst)
-          call-name (if (member? locals fname)
-                      (list 'shen.primitives/resolve-fn fname)
-                      fname)]
-      (cons call-name (for [arg rest]
+          fnexpr (cond (seq? fst)
+                       (list 'shen.primitives/resolve-fn (kl->clj locals fst))
+
+                       (member? locals fst)
+                       (list 'shen.primitives/resolve-fn fst)
+
+                       :else fst)]
+      (cons fnexpr (for [arg rest]
                     (kl->clj locals arg))))
 
     ; _ S -> (protect [QUOTE S])  where (protect (= (SYMBOLP S) T))
