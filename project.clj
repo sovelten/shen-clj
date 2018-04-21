@@ -14,4 +14,5 @@
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
              :shen-clj {:main shen.functions}}
-  :aliases {"shen-clj" ["with-profile" "shen-clj" "run"]})
+  :aliases {"shen-clj" ["with-profile" "shen-clj" "run"]
+            "make"     ["with-profile" "shen-clj" "uberjar"]})

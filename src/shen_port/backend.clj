@@ -39,7 +39,7 @@
                    {:passes-opts (assoc ana.jvm/default-passes-opts
                                         :validate/unresolvable-symbol-handler
                                         unresolvable-handler)})
-  (let [free-vars' (remove (fn [x] (some #{x} locals)) @free-vars)]
+  (let [free-vars' (distinct (remove (fn [x] (some #{x} locals)) @free-vars))]
     (if (not-empty free-vars')
       (list 'do
             (cons 'clojure.core/declare free-vars')

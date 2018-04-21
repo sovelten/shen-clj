@@ -215,10 +215,11 @@
 
 (defn-curried open
   [file mode]
-  (c/cond
-    (c/= 'out mode) (io/writer file)
-    (c/= 'in mode)  (io/input-stream file)
-    :else         (simple-error "Wrong opening mode")))
+  (c/let [path (io/file (value '*home-directory*) file)]
+    (c/cond
+      (c/= 'out mode) (io/writer path)
+      (c/= 'in mode)  (io/input-stream path)
+      :else           (simple-error "Wrong opening mode"))))
 
 (defn close
   [stream]
@@ -272,6 +273,7 @@
 (internal-set '*implementation*  "Clojure 1.9.0")
 (internal-set '*release*         "1.9")
 (internal-set '*os*              "Linux")
+(internal-set '*home-directory*  (System/getProperty "user.dir"))
 
 ;;
 ;; Function Declarations

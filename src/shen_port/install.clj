@@ -1,13 +1,10 @@
 (ns shen-port.install
   (:gen-class)
   (:require [clojure.string :as s]
-            [shen-port.backend :as backend]
-            [shen-port.kl-reader :as kl-reader]
-            [shen-port.overwrite :as overwrite]
-            [clojure.string :as str])
-  (:import [java.io StringReader PushbackReader FileNotFoundException]
-           [java.util.regex Pattern]))
-
+            [shen-port
+             [backend :as backend]
+             [overwrite :as overwrite]
+             [kl-reader :as kl-reader]]))
 
 (def kl-files
   ["toplevel.kl"
@@ -29,11 +26,7 @@
 (def kl-path "resources/klambda/")
 (def clj-path "src/shen/")
 
-(def overwrites #{'shen-dot-fillvector
-                  'shen-dot-aum_to_shen
-                  'shen-dot-aum_to_shen-aux
-                  #_'shen-dot-th*
-                  #_'shen-dot-t*-hyps})
+(def overwrites #{'shen-dot-fillvector})
 
 (defn overwrite->str
   [x]
@@ -97,6 +90,7 @@
   (let [contents     (mapv #(slurp (str kl-path %)) kl-files)
         results      (mapv #(process-file %1 %2) contents kl-files)
         header       (str "(ns shen.functions\n"
+                          "(:gen-class)\n"
                           "(:require [shen-port.primitives :as p])\n"
                           "(:refer-clojure :only []))\n")
         declarations (declarations->str (mapcat first results))
