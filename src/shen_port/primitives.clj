@@ -99,8 +99,6 @@
     "false" false
     (kl-reader/kl-symbol str)))
 
-(kl-reader/replace-all "/." kl-reader/replacements)
-
 (defn set* [X Y ns]
   @(c/intern (the-ns ns)
              (with-meta X {:dynamic true :declared true})

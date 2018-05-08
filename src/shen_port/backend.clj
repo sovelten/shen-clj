@@ -3,9 +3,6 @@
             [clojure.tools.analyzer.jvm :as ana.jvm]
             [clojure.tools.analyzer.passes.jvm.emit-form :as e]))
 
-(fn [x] (do (def pomba)
-            (pomba x)))
-
 (defmacro match?
   [vars clause]
   `(match ~vars
@@ -59,36 +56,10 @@
   [name vars body]
   (list 'shen-port.primitives/with-ns
         (list 'quote 'shen.functions)
-        (list 'shen-port.primitives/defn-curried
-              name
-              (into [] vars)
-              (kl->clj vars body))))
-
-(defn undeclared [locals code]
-  (->> code
-       flatten
-       (filter symbol?)
-       (remove (fn [x] (some #{x} locals)))
-       (remove resolve)
-       distinct))
-
-(defn auto-declare
-  [locals code]
-  (let [to-declare (undeclared (conj locals 'quote 'true 'false) code)]
-    (if (not-empty to-declare)
-      (list 'do (cons 'clojure.core/declare to-declare) code)
-      code)))
-
-(defn maybe-declare-fn
-  [locals expr]
-  (let [fname (first expr)]
-    (if (and (symbol? fname)
-             (not (boolean (some #{fname} locals)))
-             (not (resolve fname)))
-      (list 'do
-            (list 'def fname)
-            expr)
-      expr)))
+        (declare-unresolvable-symbols [] (list 'shen-port.primitives/defn-curried
+                                               name
+                                               (into [] vars)
+                                               (kl->clj vars body)))))
 
 (defn member?
   [S X]
