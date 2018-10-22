@@ -26,7 +26,8 @@
 (def kl-path "resources/klambda/")
 (def clj-path "src/shen/")
 
-(def overwrites #{'shen-dot-fillvector})
+(def overwrites #{'shen-dot-fillvector
+                  'shen-dot-read-file-as-Xlist-help})
 
 (defn overwrite->str
   [x]
