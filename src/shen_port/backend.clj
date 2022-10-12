@@ -8,10 +8,14 @@
   (if (list? expr)
     (let [[x & xs] expr]
       (cond
-        (= 'if x)  (let [[condition left right] xs]
-                     (list x condition (replace-tail-call call left) (replace-tail-call call right)))
-        (= call x) (cons 'recur xs)
-        :else      expr))
+        (= call x)  (cons 'recur xs)
+        (= 'if x)   (let [[condition left right] xs]
+                      (list x condition (replace-tail-call call left) (replace-tail-call call right)))
+        (= 'cond x) (let [clauses     (partition 2 xs)
+                          new-clauses (for [[l r] clauses]
+                                        [l (replace-tail-call call r)])]
+                      (cons 'cond (apply concat new-clauses)))
+        :else       expr))
     expr))
 
 (defmacro match?
