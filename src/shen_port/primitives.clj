@@ -267,7 +267,7 @@
 
 (internal-set '*language*        "Clojure")
 (internal-set '*port*            "0.1")
-(internal-set '*porters*         "Eric Velten de Melo")
+(internal-set '*porters*         "Sophia Velten de Melo")
 (internal-set '*implementation*  "Clojure 1.9.0")
 (internal-set '*release*         "1.9")
 (internal-set '*os*              "Linux")

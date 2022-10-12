@@ -3,6 +3,17 @@
             [clojure.tools.analyzer.jvm :as ana.jvm]
             [clojure.tools.analyzer.passes.jvm.emit-form :as e]))
 
+(defn replace-tail-call
+  [call expr]
+  (if (list? expr)
+    (let [[x & xs] expr]
+      (cond
+        (= 'if x)  (let [[condition left right] xs]
+                     (list x condition (replace-tail-call call left) (replace-tail-call call right)))
+        (= call x) (cons 'recur xs)
+        :else      expr))
+    expr))
+
 (defmacro match?
   [vars clause]
   `(match ~vars
@@ -50,7 +61,7 @@
         (declare-unresolvable-symbols [] (list 'clojure.core/defn
                                                name
                                                (into [] vars)
-                                               (kl->clj vars body)))))
+                                               (kl->clj vars (replace-tail-call name body))))))
 
 (defn curried-fn
   [name vars body]
@@ -59,7 +70,7 @@
         (declare-unresolvable-symbols [] (list 'shen-port.primitives/defn-curried
                                                name
                                                (into [] vars)
-                                               (kl->clj vars body)))))
+                                               (kl->clj vars (replace-tail-call name body))))))
 
 (defn member?
   [S X]
